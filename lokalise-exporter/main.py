@@ -111,7 +111,7 @@ def main(api_key: 'lokalise.co API key',
          output_path: 'export absolute path. It will create needed directories' = "",
          underscorize_localization_keys: 'replaces - with _ in all the localization keys' = True,
          clean_output_path_before_export: 'wipes the output path before exporting new data' = False,
-         merge_in_single_file: 'merges all the strings from all the projects_to_export in a single file' = True,
+         merge_strings: 'for each language, merges all the strings from all the projects, removing duplicates' = True,
          debug: 'true to enable debugging output' = False,
          timeout: 'timeout in seconds for each request' = 10):
 
