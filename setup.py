@@ -20,6 +20,6 @@ setup(name='lokalise-exporter',
       ],
       keywords='localization l10n internationalization i18n lokalise localise export exporter tools development',
       packages=['lokalise-exporter'],
-      install_requires=['requests'],
+      install_requires=['requests', 'begins', 'colorlog'],
       python_requires='>=3',
       zip_safe=False)
