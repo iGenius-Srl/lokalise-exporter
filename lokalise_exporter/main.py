@@ -8,6 +8,7 @@ from lokalise_exporter import *
 from lokalise_exporter.json_utils import *
 from lokalise_exporter.kotlin_exporter import *
 from lokalise_exporter.properties_utils import *
+from lokalise_exporter.xml_utils import *
 
 
 def get_output_localization_file(temp_dir, localization_file):
@@ -18,6 +19,12 @@ def get_ios_output_localization_file(temp_dir, localization_file):
     localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
     makedirs(localizable_strings_dir)
     return path.join(localizable_strings_dir, 'Localizable.strings')
+
+
+def get_android_output_localization_file(temp_dir, localization_file):
+    localizable_strings_dir = path.join(temp_dir, 'values-' + localization_file.replace('.xml', '').replace('_', '-r'))
+    makedirs(localizable_strings_dir)
+    return path.join(localizable_strings_dir, 'strings.xml')
 
 
 export_types = {
@@ -43,7 +50,13 @@ export_types = {
         'file_writer_fn': write_dict_to_properties_file
     },
 
-    'android': 'xml',
+    'android': {
+        'lokalise_type': 'xml',
+        'file_reader_fn': read_xml_strings_file_as_dict,
+        'output_localization_file_path_fn': get_android_output_localization_file,
+        'file_writer_fn': write_dict_to_xml_strings_file
+    }
+
 }
 
 

@@ -24,6 +24,6 @@ setup(name='lokalise-exporter',
           # This has to be like this because of begins package for command line parsing
           'console_scripts': ['lokalise-exporter=lokalise_exporter.main:main.start'],
       },
-      install_requires=['requests', 'begins', 'colorlog'],
+      install_requires=['requests', 'begins', 'colorlog', 'xmltodict'],
       python_requires='>=3',
       zip_safe=False)
