@@ -2,9 +2,9 @@ import begin
 import colorlog
 from requests import post, get
 from tempfile import TemporaryDirectory
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from distutils.dir_util import copy_tree, remove_tree
-from os import path, makedirs, remove
+from os import path, makedirs, remove, scandir
 from uuid import uuid4
 from time import sleep
 import zipfile
@@ -142,6 +142,80 @@ def copy_files_to_output_directory(logger, clean_output_path_before_export, temp
     copy_tree(temp_dir, output_path)
 
 
+def list_files_in_dir(dir_path):
+    return [f.name for f in scandir(dir_path) if f.is_file()]
+
+
+def get_localization_files_to_merge(logger, temp_dir, project_directories):
+    """
+    Groups files to merge for each language.
+    :param logger:
+    :param temp_dir:
+    :param project_directories:
+    :return: a dictionary like this:
+    {
+      'file1': ['projectA', 'projectB'],
+      'file2': ['projectA']
+    }
+    """
+
+    localization_files_to_merge = {}
+
+    for project_dir in project_directories:
+        logger.debug("Searching for localization files in " + project_dir)
+
+        for localized_file in list_files_in_dir(path.join(temp_dir, project_dir)):
+            logger.debug("  ->  Found " + localized_file)
+
+            if localized_file in localization_files_to_merge:
+                localization_files_to_merge[localized_file].append(project_dir)
+            else:
+                localization_files_to_merge[localized_file] = [project_dir]
+
+    return localization_files_to_merge
+
+
+def read_properties_file_as_dict(file_path, underscorize_keys):
+    properties = {}
+
+    with open(file_path, 'r') as file:
+        for line in file:
+            line = line.rstrip()  # removes trailing whitespace and '\n' chars
+
+            if line.startswith("#") or "=" not in line:
+                continue  # skips blanks and comments
+
+            key, value = line.split("=", 1)
+            key = str(key).strip()
+            value = str(value).strip()
+
+            if underscorize_keys:
+                key = key.replace('-', '_')
+
+            properties[key] = value
+
+    return properties
+
+
+def intersect_dict(dict_a: 'dict', dict_b: 'dict'):
+    keys_a = set(dict_a.keys())
+    keys_b = set(dict_b.keys())
+    return keys_a & keys_b
+
+
+def log_duplicated_keys(logger, dict_a: 'dict', dict_b: 'dict'):
+    duplicated_keys = intersect_dict(dict_a, dict_b)
+    if duplicated_keys:
+        for duplicated_key in duplicated_keys:
+            logger.error("Found duplicated localization key: " + duplicated_key + ". Using value from last project ID")
+
+
+def write_dict_to_strings_file(dictionary: 'dict', file_path):
+    ordered_dictionary = OrderedDict(sorted(dictionary.items()))
+    with open(file_path, 'w') as file:
+        file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())
+
+
 @begin.start(auto_convert=True, lexical_order=True)
 def main(api_key: 'lokalise.co API key',
          projects_to_export: 'comma separated list of project IDs to be exported',
@@ -169,7 +243,31 @@ def main(api_key: 'lokalise.co API key',
         with TemporaryDirectory(prefix="lokalise-exporter") as temp_dir:
             exported_project_files = export_projects(logger, temp_dir, projects, api_key, export_format, timeout)
             project_directories = unzip_exported_projects(logger, temp_dir, exported_project_files)
-            logger.info(project_directories)
+            localization_files_to_merge = get_localization_files_to_merge(logger, temp_dir, project_directories)
+
+            if export_format == 'ios':
+                for localization_file in localization_files_to_merge:
+                    localization_keys = {}
+
+                    for project_dir in localization_files_to_merge[localization_file]:
+                        file_path = path.join(temp_dir, project_dir, localization_file)
+                        logger.debug("Reading localization keys from " + file_path)
+                        new_keys = read_properties_file_as_dict(file_path, underscorize_localization_keys)
+                        log_duplicated_keys(logger, localization_keys, new_keys)
+                        localization_keys.update(new_keys)
+                        logger.debug("Removing " + file_path)
+                        remove(file_path)
+
+                    localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
+                    makedirs(localizable_strings_dir)
+                    localizable_strings_file = path.join(localizable_strings_dir, 'Localizable.strings')
+                    write_dict_to_strings_file(localization_keys, localizable_strings_file)
+
+            logger.debug("Removing project directories")
+            for project in project_directories:
+                project_path = path.join(temp_dir, project)
+                logger.debug("Removing directory: " + project_path)
+                remove_tree(project_path)
 
             copy_files_to_output_directory(logger, clean_output_path_before_export, temp_dir, output_path)
 
