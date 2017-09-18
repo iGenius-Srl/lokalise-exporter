@@ -1,5 +1,6 @@
 import begin
 import colorlog
+import json
 from requests import post, get
 from tempfile import TemporaryDirectory
 from collections import namedtuple, OrderedDict
@@ -10,9 +11,84 @@ from time import sleep
 import zipfile
 
 
-lokalise_format_mapping = {
-    'json': 'json',
-    'ios': 'strings',
+def underscorize_key(value, underscorize_keys):
+    stripped = str(value).strip()
+
+    if underscorize_keys:
+        return stripped.replace('-', '_')
+
+    return stripped
+
+
+def read_json_file_as_dict(file_path, underscorize_keys):
+    with open(file_path) as json_file:
+        data = json.load(json_file)
+
+    data_out = {}
+
+    for key in data:
+        value = str(data[key]).strip()
+        key = underscorize_key(key, underscorize_keys)
+        data_out[key] = value
+
+    return data_out
+
+
+def write_dict_to_json_file(dictionary: 'dict', file_path):
+    with open(file_path, 'w') as output:
+        json.dump(dictionary, output, sort_keys=True, indent=2)
+
+
+def read_properties_file_as_dict(file_path, underscorize_keys):
+    properties = {}
+
+    with open(file_path, 'r') as file:
+        for line in file:
+            line = line.rstrip()  # removes trailing whitespace and '\n' chars
+
+            if line.startswith("#") or "=" not in line:
+                continue  # skips blanks and comments
+
+            key, value = line.split("=", 1)
+            key = underscorize_key(key, underscorize_keys)
+            value = str(value).strip()
+
+            properties[key] = value
+
+    return properties
+
+
+def write_dict_to_strings_file(dictionary: 'dict', file_path):
+    ordered_dictionary = OrderedDict(sorted(dictionary.items()))
+    with open(file_path, 'w') as file:
+        file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())
+
+
+def get_json_output_localization_file(temp_dir, localization_file):
+    return path.join(temp_dir, localization_file)
+
+
+def get_ios_output_localization_file(temp_dir, localization_file):
+    localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
+    makedirs(localizable_strings_dir)
+    return path.join(localizable_strings_dir, 'Localizable.strings')
+
+
+export_types = {
+    'json': {
+        'lokalise_type': 'json',
+        'file_reader_fn': read_json_file_as_dict,
+        'output_localization_file_path_fn': get_json_output_localization_file,
+        'file_writer_fn': write_dict_to_json_file
+    },
+
+    'ios': {
+        'lokalise_type': 'strings',
+        'file_reader_fn': read_properties_file_as_dict,
+        'output_localization_file_path_fn': get_ios_output_localization_file,
+        'file_writer_fn': write_dict_to_strings_file
+    },
+
     'android': 'xml',
     'kotlin': 'properties'
 }
@@ -81,7 +157,7 @@ def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
     post_params = {
         'id': project_id,
         'api_token': api_key,
-        'type': lokalise_format_mapping[export_type],
+        'type': export_types[export_type]['lokalise_type'],
         'bundle_structure': '%LANG_ISO%.%FORMAT%',
         'export_empty': 'skip'
     }
@@ -103,11 +179,11 @@ def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
     return LokaliseProject(projectID=project_id, zippedFileName=downloaded_file)
 
 
-def export_projects(logger, temp_dir, projects, api_key, export_format, timeout):
+def export_projects(logger, temp_dir, projects, api_key, export_type, timeout):
     exported_project_files = []
 
     for index, project in enumerate(projects):
-        exported_project = export_project(logger, temp_dir, api_key, project, export_format, timeout)
+        exported_project = export_project(logger, temp_dir, api_key, project, export_type, timeout)
         exported_project_files.append(exported_project)
 
         if not index == len(projects) - 1:
@@ -175,49 +251,22 @@ def get_localization_files_to_merge(logger, temp_dir, project_directories):
     return localization_files_to_merge
 
 
-def read_properties_file_as_dict(file_path, underscorize_keys):
-    properties = {}
-
-    with open(file_path, 'r') as file:
-        for line in file:
-            line = line.rstrip()  # removes trailing whitespace and '\n' chars
-
-            if line.startswith("#") or "=" not in line:
-                continue  # skips blanks and comments
-
-            key, value = line.split("=", 1)
-            key = str(key).strip()
-            value = str(value).strip()
-
-            if underscorize_keys:
-                key = key.replace('-', '_')
-
-            properties[key] = value
-
-    return properties
-
-
 def intersect_dict(dict_a: 'dict', dict_b: 'dict'):
     keys_a = set(dict_a.keys())
     keys_b = set(dict_b.keys())
     return keys_a & keys_b
 
 
-def log_duplicated_keys(logger, dict_a: 'dict', dict_b: 'dict'):
+def log_duplicated_keys(logger, localization_file, dict_a: 'dict', dict_b: 'dict'):
     duplicated_keys = intersect_dict(dict_a, dict_b)
     if duplicated_keys:
         for duplicated_key in duplicated_keys:
-            logger.error("Found duplicated localization key: " + duplicated_key + ". Using value from last project ID")
+            logger.error("Found duplicated localization key in " + localization_file + ": " + duplicated_key
+                         + ". Using value from last project ID")
 
 
-def write_dict_to_strings_file(dictionary: 'dict', file_path):
-    ordered_dictionary = OrderedDict(sorted(dictionary.items()))
-    with open(file_path, 'w') as file:
-        file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())
-
-
-def export_for_ios(logger, temp_dir, localization_files_to_merge, underscorize_localization_keys):
-    logger.info("Performing iOS-specific tasks")
+def merge_localizations(logger, temp_dir, export_type, localization_files_to_merge, underscorize_localization_keys):
+    logger.info("Merging " + export_type + " localization files")
 
     for localization_file in localization_files_to_merge:
         localization_keys = {}
@@ -225,51 +274,48 @@ def export_for_ios(logger, temp_dir, localization_files_to_merge, underscorize_l
         for project_dir in localization_files_to_merge[localization_file]:
             file_path = path.join(temp_dir, project_dir, localization_file)
             logger.debug("Reading localization keys from " + file_path)
-            new_keys = read_properties_file_as_dict(file_path, underscorize_localization_keys)
-            log_duplicated_keys(logger, localization_keys, new_keys)
+            new_keys = export_types[export_type]['file_reader_fn'](file_path, underscorize_localization_keys)
+            log_duplicated_keys(logger, localization_file, localization_keys, new_keys)
             localization_keys.update(new_keys)
             logger.debug("Removing " + file_path)
             remove(file_path)
 
-        localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
-        makedirs(localizable_strings_dir)
-        localizable_strings_file = path.join(localizable_strings_dir, 'Localizable.strings')
-        write_dict_to_strings_file(localization_keys, localizable_strings_file)
+        localization_path = export_types[export_type]['output_localization_file_path_fn'](temp_dir, localization_file)
+        export_types[export_type]['file_writer_fn'](localization_keys, localization_path)
 
 
 @begin.start(auto_convert=True, lexical_order=True)
 def main(api_key: 'lokalise.co API key',
          projects_to_export: 'comma separated list of project IDs to be exported',
-         export_format: 'exported format. It can be json, ios, android or kotlin',
+         export_type: 'exported format. It can be json, ios, android or kotlin',
          output_path: 'export absolute path. It will create needed directories' = "",
          underscorize_localization_keys: 'replaces - with _ in all the localization keys' = True,
          clean_output_path_before_export: 'wipes the output path before exporting new data' = False,
-         merge_strings: 'for each language, merges all the strings from all the projects, removing duplicates' = True,
          debug: 'true to enable debugging output' = False,
          timeout: 'timeout in seconds for each request' = 10):
 
     logger = init_logger(debug)
     projects = parse_projects_to_export(projects_to_export)
 
-    if export_format not in lokalise_format_mapping:
-        logger.error("export_format must be one of the following: %s", ",".join(lokalise_format_mapping.keys()))
+    if export_type not in export_types:
+        logger.error("export_type must be one of the following: %s", ",".join(export_types.keys()))
         return -1
 
     logger.debug("Using API Key: %s", api_key)
-    logger.debug("Exporting format: %s", format)
+    logger.debug("Exporting type: %s", format)
     logger.debug("Output path: %s", output_path)
     logger.debug("Projects to export: %s", projects)
 
     try:
         with TemporaryDirectory(prefix="lokalise-exporter") as temp_dir:
-            exported_project_files = export_projects(logger, temp_dir, projects, api_key, export_format, timeout)
+            exported_project_files = export_projects(logger, temp_dir, projects, api_key, export_type, timeout)
             project_directories = unzip_exported_projects(logger, temp_dir, exported_project_files)
             localization_files_to_merge = get_localization_files_to_merge(logger, temp_dir, project_directories)
 
-            if export_format == 'ios':
-                export_for_ios(logger, temp_dir, localization_files_to_merge, underscorize_localization_keys)
+            merge_localizations(logger, temp_dir, export_type, localization_files_to_merge,
+                                underscorize_localization_keys)
 
-            logger.debug("Removing project directories")
+            logger.debug("Removing temp project directories")
             for project in project_directories:
                 project_path = path.join(temp_dir, project)
                 logger.debug("Removing directory: " + project_path)
