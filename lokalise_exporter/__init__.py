@@ -32,7 +32,7 @@ def underscorize(value, underscorize_keys):
     stripped = str(value).strip()
 
     if underscorize_keys:
-        return stripped.replace('-', '_')
+        return stripped.replace('-', '_').replace('.', '_')
 
     return stripped
 
@@ -86,3 +86,11 @@ def download_file(logger, temp_dir, file_to_download, timeout):
 def unzip_file(file, output_dir):
     with zipfile.ZipFile(file, "r") as zipped:
         zipped.extractall(output_dir)
+
+
+def file_len(fname):
+    i = 0
+    with open(fname, 'r') as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1

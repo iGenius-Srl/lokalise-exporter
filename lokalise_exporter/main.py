@@ -6,10 +6,11 @@ from time import sleep
 
 from lokalise_exporter import *
 from lokalise_exporter.json_utils import *
+from lokalise_exporter.kotlin_exporter import *
 from lokalise_exporter.properties_utils import *
 
 
-def get_json_output_localization_file(temp_dir, localization_file):
+def get_output_localization_file(temp_dir, localization_file):
     return path.join(temp_dir, localization_file)
 
 
@@ -24,7 +25,7 @@ export_types = {
     'json': {
         'lokalise_type': 'json',
         'file_reader_fn': read_json_file_as_dict,
-        'output_localization_file_path_fn': get_json_output_localization_file,
+        'output_localization_file_path_fn': get_output_localization_file,
         'file_writer_fn': write_dict_to_json_file
     },
 
@@ -35,8 +36,14 @@ export_types = {
         'file_writer_fn': write_dict_to_properties_file
     },
 
+    'kotlin': {
+        'lokalise_type': 'properties',
+        'file_reader_fn': read_properties_file_as_dict,
+        'output_localization_file_path_fn': get_output_localization_file,
+        'file_writer_fn': write_dict_to_properties_file
+    },
+
     'android': 'xml',
-    'kotlin': 'properties'
 }
 
 
@@ -136,8 +143,11 @@ def log_duplicated_keys(logger, localization_file, dict_a: 'dict', dict_b: 'dict
                          + ". Using value from last project ID")
 
 
-def merge_localizations(logger, temp_dir, export_type, localization_files_to_merge, underscorize_localization_keys):
+def merge_localizations(logger, temp_dir, export_type, localization_files_to_merge, underscorize_localization_keys,
+                        kotlin_package):
     logger.info("Merging " + export_type + " localization files")
+
+    localization_files = []
 
     for localization_file in localization_files_to_merge:
         localization_keys = {}
@@ -153,6 +163,11 @@ def merge_localizations(logger, temp_dir, export_type, localization_files_to_mer
 
         localization_path = export_types[export_type]['output_localization_file_path_fn'](temp_dir, localization_file)
         export_types[export_type]['file_writer_fn'](localization_keys, localization_path)
+        localization_files.append(localization_path)
+
+    if export_type == 'kotlin':
+        generate_kotlin_strings_table(logger, temp_dir, localization_files, kotlin_package,
+                                      underscorize_localization_keys)
 
 
 def remove_temp_project_dirs(logger, temp_dir, project_directories):
@@ -169,10 +184,12 @@ def main(api_key: 'lokalise.co API key',
          projects_to_export: 'comma separated list of project IDs to be exported',
          export_type: 'exported format. It can be json, ios, android or kotlin',
          output_path: 'export absolute path. It will create needed directories' = "",
-         underscorize_localization_keys: 'replaces - with _ in all the localization keys' = True,
+         underscorize_localization_keys: 'replaces - and . with _ in all the localization keys' = True,
          clean_output_path_before_export: 'wipes the output path before exporting new data' = False,
          debug: 'true to enable debugging output' = False,
-         timeout: 'timeout in seconds for each request' = 10):
+         timeout: 'timeout in seconds for each request' = 10,
+         kotlin_package: 'package of the generated localization keys file' = default_kotlin_package):
+
     logger = init_logger(debug)
     projects = parse_projects_to_export(projects_to_export)
 
@@ -192,7 +209,7 @@ def main(api_key: 'lokalise.co API key',
             localization_files_to_merge = get_localization_files_to_merge(logger, temp_dir, project_directories)
 
             merge_localizations(logger, temp_dir, export_type, localization_files_to_merge,
-                                underscorize_localization_keys)
+                                underscorize_localization_keys, kotlin_package)
 
             remove_temp_project_dirs(logger, temp_dir, project_directories)
 
