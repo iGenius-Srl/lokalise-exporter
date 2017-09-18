@@ -1,67 +1,16 @@
 import begin
-import colorlog
-import json
 from requests import post, get
 from tempfile import TemporaryDirectory
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from distutils.dir_util import copy_tree, remove_tree
 from os import path, makedirs, remove, scandir
 from uuid import uuid4
 from time import sleep
 import zipfile
 
-
-def underscorize_key(value, underscorize_keys):
-    stripped = str(value).strip()
-
-    if underscorize_keys:
-        return stripped.replace('-', '_')
-
-    return stripped
-
-
-def read_json_file_as_dict(file_path, underscorize_keys):
-    with open(file_path) as json_file:
-        data = json.load(json_file)
-
-    data_out = {}
-
-    for key in data:
-        value = str(data[key]).strip()
-        key = underscorize_key(key, underscorize_keys)
-        data_out[key] = value
-
-    return data_out
-
-
-def write_dict_to_json_file(dictionary: 'dict', file_path):
-    with open(file_path, 'w') as output:
-        json.dump(dictionary, output, sort_keys=True, indent=2)
-
-
-def read_properties_file_as_dict(file_path, underscorize_keys):
-    properties = {}
-
-    with open(file_path, 'r') as file:
-        for line in file:
-            line = line.rstrip()  # removes trailing whitespace and '\n' chars
-
-            if line.startswith("#") or "=" not in line:
-                continue  # skips blanks and comments
-
-            key, value = line.split("=", 1)
-            key = underscorize_key(key, underscorize_keys)
-            value = str(value).strip()
-
-            properties[key] = value
-
-    return properties
-
-
-def write_dict_to_strings_file(dictionary: 'dict', file_path):
-    ordered_dictionary = OrderedDict(sorted(dictionary.items()))
-    with open(file_path, 'w') as file:
-        file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())
+from lokalise_exporter import *
+from lokalise_exporter.json_utils import *
+from lokalise_exporter.properties_utils import *
 
 
 def get_json_output_localization_file(temp_dir, localization_file):
@@ -86,7 +35,7 @@ export_types = {
         'lokalise_type': 'strings',
         'file_reader_fn': read_properties_file_as_dict,
         'output_localization_file_path_fn': get_ios_output_localization_file,
-        'file_writer_fn': write_dict_to_strings_file
+        'file_writer_fn': write_dict_to_properties_file
     },
 
     'android': 'xml',
@@ -94,21 +43,6 @@ export_types = {
 }
 
 LokaliseProject = namedtuple('LokaliseProject', ['projectID', 'zippedFileName'])
-
-
-def init_logger(debug):
-    logger = colorlog.getLogger()
-
-    if debug:
-        logger.setLevel(colorlog.colorlog.logging.DEBUG)
-    else:
-        logger.setLevel(colorlog.colorlog.logging.INFO)
-
-    handler = colorlog.StreamHandler()
-    handler.setFormatter(colorlog.ColoredFormatter(fmt="%(log_color)s%(levelname)s %(message)s"))
-    logger.addHandler(handler)
-
-    return logger
 
 
 def parse_projects_to_export(input_str):
@@ -216,10 +150,6 @@ def copy_files_to_output_directory(logger, clean_output_path_before_export, temp
 
     logger.info("Copying exported files into: " + output_path)
     copy_tree(temp_dir, output_path)
-
-
-def list_files_in_dir(dir_path):
-    return [f.name for f in scandir(dir_path) if f.is_file()]
 
 
 def get_localization_files_to_merge(logger, temp_dir, project_directories):
