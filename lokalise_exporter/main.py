@@ -1,12 +1,9 @@
 import begin
 from requests import post, get
 from tempfile import TemporaryDirectory
-from collections import namedtuple
-from distutils.dir_util import copy_tree, remove_tree
-from os import path, makedirs, remove, scandir
+from os import makedirs, remove
 from uuid import uuid4
 from time import sleep
-import zipfile
 
 from lokalise_exporter import *
 from lokalise_exporter.json_utils import *
@@ -24,6 +21,7 @@ def get_ios_output_localization_file(temp_dir, localization_file):
 
 
 export_types = {
+
     'json': {
         'lokalise_type': 'json',
         'file_reader_fn': read_json_file_as_dict,
@@ -41,29 +39,6 @@ export_types = {
     'android': 'xml',
     'kotlin': 'properties'
 }
-
-LokaliseProject = namedtuple('LokaliseProject', ['projectID', 'zippedFileName'])
-
-
-def parse_projects_to_export(input_str):
-    if not input_str or not isinstance(input_str, str):
-        return []
-
-    projects = str(input_str).split(",")
-
-    return [entry.strip() for entry in projects]
-
-
-def get_output_path(output_path: 'str'):
-    out_path = path.abspath(output_path)
-    makedirs(out_path, exist_ok=True)
-
-    return out_path
-
-
-def unzip_file(file, output_dir):
-    with zipfile.ZipFile(file, "r") as zipped:
-        zipped.extractall(output_dir)
 
 
 def download_file(logger, temp_dir, file_to_download, timeout):
@@ -127,7 +102,7 @@ def export_projects(logger, temp_dir, projects, api_key, export_type, timeout):
     return exported_project_files
 
 
-def unzip_exported_projects(logger, temp_dir, exported_projects):
+def unzip_exported_projects(logger, temp_dir, exported_projects: 'list<LokaliseProject>'):
     unzipped_dirs = []
 
     for project in exported_projects:
@@ -141,15 +116,6 @@ def unzip_exported_projects(logger, temp_dir, exported_projects):
         logger.debug("Unzipped " + project.zippedFileName + " in " + unzipped_dir)
 
     return unzipped_dirs
-
-
-def copy_files_to_output_directory(logger, clean_output_path_before_export, temp_dir, output_path):
-    if clean_output_path_before_export and path.exists(output_path):
-        logger.info("Cleaning output path before export: " + output_path)
-        remove_tree(output_path)
-
-    logger.info("Copying exported files into: " + output_path)
-    copy_tree(temp_dir, output_path)
 
 
 def get_localization_files_to_merge(logger, temp_dir, project_directories):
@@ -181,12 +147,6 @@ def get_localization_files_to_merge(logger, temp_dir, project_directories):
     return localization_files_to_merge
 
 
-def intersect_dict(dict_a: 'dict', dict_b: 'dict'):
-    keys_a = set(dict_a.keys())
-    keys_b = set(dict_b.keys())
-    return keys_a & keys_b
-
-
 def log_duplicated_keys(logger, localization_file, dict_a: 'dict', dict_b: 'dict'):
     duplicated_keys = intersect_dict(dict_a, dict_b)
     if duplicated_keys:
@@ -216,6 +176,7 @@ def merge_localizations(logger, temp_dir, export_type, localization_files_to_mer
 
 def remove_temp_project_dirs(logger, temp_dir, project_directories):
     logger.debug("Removing temp project directories")
+
     for project in project_directories:
         project_path = path.join(temp_dir, project)
         logger.debug("Removing directory: " + project_path)

@@ -1,4 +1,4 @@
-from lokalise_exporter import underscorize_key
+from lokalise_exporter import underscorize
 import json
 
 
@@ -11,7 +11,7 @@ def read_json_file_as_dict(file_path, underscorize_keys):
     for key in data:
         value = str(data[key]).strip()
 
-        key = underscorize_key(key, underscorize_keys)
+        key = underscorize(key, underscorize_keys)
         data_out[key] = value
 
     return data_out

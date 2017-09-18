@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from lokalise_exporter import underscorize_key
+from lokalise_exporter import underscorize
 
 
 def read_properties_file_as_dict(file_path, underscorize_keys):
@@ -13,7 +13,7 @@ def read_properties_file_as_dict(file_path, underscorize_keys):
                 continue  # skips blanks and comments
 
             key, value = line.split("=", 1)
-            key = underscorize_key(key, underscorize_keys)
+            key = underscorize(key, underscorize_keys)
             value = str(value).strip()
 
             properties[key] = value
