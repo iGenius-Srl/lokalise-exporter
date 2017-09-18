@@ -1,8 +1,7 @@
 import begin
-from requests import post, get
+from requests import post
 from tempfile import TemporaryDirectory
 from os import makedirs, remove
-from uuid import uuid4
 from time import sleep
 
 from lokalise_exporter import *
@@ -39,24 +38,6 @@ export_types = {
     'android': 'xml',
     'kotlin': 'properties'
 }
-
-
-def download_file(logger, temp_dir, file_to_download, timeout):
-    download_path = path.join(temp_dir, uuid4().hex)
-    logger.debug("Downloading %s in %s", file_to_download, download_path)
-
-    download_request = get(file_to_download, stream=True, timeout=timeout)
-
-    if download_request.status_code == 200:
-        with open(download_path, 'wb') as file:
-            for chunk in download_request.iter_content(1024):
-                file.write(chunk)
-        logger.debug("Downloaded %s in %s", file_to_download, download_path)
-        return download_path
-
-    else:
-        raise RuntimeError("Error while downloading " + file_to_download + ". HTTP status "
-                           + str(download_request.status_code))
 
 
 def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
@@ -192,7 +173,6 @@ def main(api_key: 'lokalise.co API key',
          clean_output_path_before_export: 'wipes the output path before exporting new data' = False,
          debug: 'true to enable debugging output' = False,
          timeout: 'timeout in seconds for each request' = 10):
-
     logger = init_logger(debug)
     projects = parse_projects_to_export(projects_to_export)
 

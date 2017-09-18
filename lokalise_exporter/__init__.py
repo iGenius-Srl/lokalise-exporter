@@ -1,9 +1,10 @@
 import zipfile
 from collections import namedtuple
 from distutils.dir_util import remove_tree, copy_tree
+from requests import get
 from os import scandir, path
+from uuid import uuid4
 import colorlog
-
 
 # Custom data types
 
@@ -62,6 +63,24 @@ def parse_projects_to_export(input_str):
     projects = str(input_str).split(",")
 
     return [entry.strip() for entry in projects]
+
+
+def download_file(logger, temp_dir, file_to_download, timeout):
+    download_path = path.join(temp_dir, uuid4().hex)
+    logger.debug("Downloading %s in %s", file_to_download, download_path)
+
+    download_request = get(file_to_download, stream=True, timeout=timeout)
+
+    if download_request.status_code == 200:
+        with open(download_path, 'wb') as file:
+            for chunk in download_request.iter_content(1024):
+                file.write(chunk)
+        logger.debug("Downloaded %s in %s", file_to_download, download_path)
+        return download_path
+
+    else:
+        raise RuntimeError("Error while downloading " + file_to_download + ". HTTP status "
+                           + str(download_request.status_code))
 
 
 def unzip_file(file, output_dir):
