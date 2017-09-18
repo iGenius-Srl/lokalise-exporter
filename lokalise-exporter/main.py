@@ -284,6 +284,14 @@ def merge_localizations(logger, temp_dir, export_type, localization_files_to_mer
         export_types[export_type]['file_writer_fn'](localization_keys, localization_path)
 
 
+def remove_temp_project_dirs(logger, temp_dir, project_directories):
+    logger.debug("Removing temp project directories")
+    for project in project_directories:
+        project_path = path.join(temp_dir, project)
+        logger.debug("Removing directory: " + project_path)
+        remove_tree(project_path)
+
+
 @begin.start(auto_convert=True, lexical_order=True)
 def main(api_key: 'lokalise.co API key',
          projects_to_export: 'comma separated list of project IDs to be exported',
@@ -315,11 +323,7 @@ def main(api_key: 'lokalise.co API key',
             merge_localizations(logger, temp_dir, export_type, localization_files_to_merge,
                                 underscorize_localization_keys)
 
-            logger.debug("Removing temp project directories")
-            for project in project_directories:
-                project_path = path.join(temp_dir, project)
-                logger.debug("Removing directory: " + project_path)
-                remove_tree(project_path)
+            remove_temp_project_dirs(logger, temp_dir, project_directories)
 
             copy_files_to_output_directory(logger, clean_output_path_before_export, temp_dir, output_path)
 
