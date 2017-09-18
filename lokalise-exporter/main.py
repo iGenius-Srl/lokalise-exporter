@@ -2,7 +2,8 @@ import begin
 import colorlog
 from requests import post, get
 from tempfile import TemporaryDirectory
-from os import path
+from distutils.dir_util import copy_tree, remove_tree
+from os import path, makedirs, remove
 from uuid import uuid4
 from time import sleep
 import zipfile
@@ -38,6 +39,13 @@ def parse_projects_to_export(input_str):
     projects = str(input_str).split(",")
 
     return [entry.strip() for entry in projects]
+
+
+def get_output_path(output_path: 'str'):
+    out_path = path.abspath(output_path)
+    makedirs(out_path, exist_ok=True)
+
+    return out_path
 
 
 def unzip_file(file, output_dir):
@@ -81,7 +89,7 @@ def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
 
     if response['response']['status'] == 'error':
         resp = response['response']
-        raise RuntimeError("lokalise error " + resp['code'] + ": " + resp['message'])
+        raise RuntimeError("lokalise error " + str(resp['code']) + ": " + resp['message'])
 
     file_to_download = "https://s3-eu-west-1.amazonaws.com/lokalise-assets/" + response['bundle']['file']
     logger.debug("project %s will be exported from %s", project_id, file_to_download)
@@ -102,6 +110,31 @@ def export_projects(logger, temp_dir, projects, api_key, export_format, timeout)
             sleep(5)
 
     return exported_project_files
+
+
+def unzip_exported_projects(logger, temp_dir, exported_project_files):
+    unzipped_dirs = []
+
+    for zip_file in exported_project_files:
+        unzipped_dir = path.join(temp_dir, uuid4().hex)
+        logger.debug("Unzipping " + zip_file + " in " + unzipped_dir)
+
+        unzip_file(zip_file, unzipped_dir)
+        remove(zip_file)
+        unzipped_dirs.append(unzipped_dir)
+
+        logger.debug("Unzipped " + zip_file + " in " + unzipped_dir)
+
+    return unzipped_dirs
+
+
+def copy_files_to_output_directory(logger, clean_output_path_before_export, temp_dir, output_path):
+    if clean_output_path_before_export and path.exists(output_path):
+        logger.info("Cleaning output path before export: " + output_path)
+        remove_tree(output_path)
+
+    logger.info("Copying exported files into: " + output_path)
+    copy_tree(temp_dir, output_path)
 
 
 @begin.start(auto_convert=True, lexical_order=True)
@@ -130,9 +163,14 @@ def main(api_key: 'lokalise.co API key',
     try:
         with TemporaryDirectory(prefix="lokalise-exporter") as temp_dir:
             exported_project_files = export_projects(logger, temp_dir, projects, api_key, export_format, timeout)
-            logger.info(exported_project_files)
+            project_directories = unzip_exported_projects(logger, temp_dir, exported_project_files)
+            logger.info(project_directories)
+
+            copy_files_to_output_directory(logger, clean_output_path_before_export, temp_dir, output_path)
+
+            logger.info("Done!")
 
     except Exception as exc:
-        logger.error("Export failed!")
+        logger.error("Export failed! Don't worry, output path is untouched: " + output_path)
         logger.error(exc)
         return -2
