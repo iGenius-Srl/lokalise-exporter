@@ -216,6 +216,27 @@ def write_dict_to_strings_file(dictionary: 'dict', file_path):
         file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())
 
 
+def export_for_ios(logger, temp_dir, localization_files_to_merge, underscorize_localization_keys):
+    logger.info("Performing iOS-specific tasks")
+
+    for localization_file in localization_files_to_merge:
+        localization_keys = {}
+
+        for project_dir in localization_files_to_merge[localization_file]:
+            file_path = path.join(temp_dir, project_dir, localization_file)
+            logger.debug("Reading localization keys from " + file_path)
+            new_keys = read_properties_file_as_dict(file_path, underscorize_localization_keys)
+            log_duplicated_keys(logger, localization_keys, new_keys)
+            localization_keys.update(new_keys)
+            logger.debug("Removing " + file_path)
+            remove(file_path)
+
+        localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
+        makedirs(localizable_strings_dir)
+        localizable_strings_file = path.join(localizable_strings_dir, 'Localizable.strings')
+        write_dict_to_strings_file(localization_keys, localizable_strings_file)
+
+
 @begin.start(auto_convert=True, lexical_order=True)
 def main(api_key: 'lokalise.co API key',
          projects_to_export: 'comma separated list of project IDs to be exported',
@@ -246,22 +267,7 @@ def main(api_key: 'lokalise.co API key',
             localization_files_to_merge = get_localization_files_to_merge(logger, temp_dir, project_directories)
 
             if export_format == 'ios':
-                for localization_file in localization_files_to_merge:
-                    localization_keys = {}
-
-                    for project_dir in localization_files_to_merge[localization_file]:
-                        file_path = path.join(temp_dir, project_dir, localization_file)
-                        logger.debug("Reading localization keys from " + file_path)
-                        new_keys = read_properties_file_as_dict(file_path, underscorize_localization_keys)
-                        log_duplicated_keys(logger, localization_keys, new_keys)
-                        localization_keys.update(new_keys)
-                        logger.debug("Removing " + file_path)
-                        remove(file_path)
-
-                    localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
-                    makedirs(localizable_strings_dir)
-                    localizable_strings_file = path.join(localizable_strings_dir, 'Localizable.strings')
-                    write_dict_to_strings_file(localization_keys, localizable_strings_file)
+                export_for_ios(logger, temp_dir, localization_files_to_merge, underscorize_localization_keys)
 
             logger.debug("Removing project directories")
             for project in project_directories:
