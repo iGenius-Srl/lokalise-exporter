@@ -2,6 +2,7 @@ import begin
 import colorlog
 from requests import post, get
 from tempfile import TemporaryDirectory
+from collections import namedtuple
 from distutils.dir_util import copy_tree, remove_tree
 from os import path, makedirs, remove
 from uuid import uuid4
@@ -15,6 +16,8 @@ lokalise_format_mapping = {
     'android': 'xml',
     'kotlin': 'properties'
 }
+
+LokaliseProject = namedtuple('LokaliseProject', ['projectID', 'zippedFileName'])
 
 
 def init_logger(debug):
@@ -96,34 +99,36 @@ def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
 
     downloaded_file = download_file(logger, temp_dir, file_to_download, timeout)
     logger.info("Project %s exported", project_id)
-    return downloaded_file
+
+    return LokaliseProject(projectID=project_id, zippedFileName=downloaded_file)
 
 
 def export_projects(logger, temp_dir, projects, api_key, export_format, timeout):
     exported_project_files = []
 
     for index, project in enumerate(projects):
-        exported_project_files.append(export_project(logger, temp_dir, api_key, project, export_format, timeout))
+        exported_project = export_project(logger, temp_dir, api_key, project, export_format, timeout)
+        exported_project_files.append(exported_project)
 
         if not index == len(projects) - 1:
-            logger.info("Waiting 5s because of the lokalise.co flood detector...")
+            logger.info("Waiting 5s because of the lokalise.co flood detector, please be patient ...")
             sleep(5)
 
     return exported_project_files
 
 
-def unzip_exported_projects(logger, temp_dir, exported_project_files):
+def unzip_exported_projects(logger, temp_dir, exported_projects):
     unzipped_dirs = []
 
-    for zip_file in exported_project_files:
-        unzipped_dir = path.join(temp_dir, uuid4().hex)
-        logger.debug("Unzipping " + zip_file + " in " + unzipped_dir)
+    for project in exported_projects:
+        unzipped_dir = path.join(temp_dir, project.projectID)
+        logger.debug("Unzipping " + project.projectID + " in " + unzipped_dir)
 
-        unzip_file(zip_file, unzipped_dir)
-        remove(zip_file)
-        unzipped_dirs.append(unzipped_dir)
+        unzip_file(project.zippedFileName, unzipped_dir)
+        remove(project.zippedFileName)
+        unzipped_dirs.append(project.projectID)
 
-        logger.debug("Unzipped " + zip_file + " in " + unzipped_dir)
+        logger.debug("Unzipped " + project.zippedFileName + " in " + unzipped_dir)
 
     return unzipped_dirs
 
@@ -172,5 +177,5 @@ def main(api_key: 'lokalise.co API key',
 
     except Exception as exc:
         logger.error("Export failed! Don't worry, output path is untouched: " + output_path)
-        logger.error(exc)
+        logger.exception(exc)
         return -2
