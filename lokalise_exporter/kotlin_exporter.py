@@ -1,3 +1,10 @@
+# Python 2.x retro-compatibility
+from __future__ import unicode_literals, print_function, division, absolute_import
+from builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Imports
 from collections import OrderedDict
 from os import path
 

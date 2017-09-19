@@ -1,3 +1,10 @@
+# Python 2.x retro-compatibility
+from __future__ import unicode_literals, print_function, division, absolute_import
+from builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Imports
 from lokalise_exporter import underscorize
 import json
 
@@ -17,6 +24,6 @@ def read_json_file_as_dict(file_path, underscorize_keys):
     return data_out
 
 
-def write_dict_to_json_file(dictionary: 'dict', file_path):
+def write_dict_to_json_file(dictionary, file_path):
     with open(file_path, 'w') as output:
         json.dump(dictionary, output, sort_keys=True, indent=2)

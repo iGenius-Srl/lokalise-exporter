@@ -1,3 +1,10 @@
+# Python 2.x retro-compatibility
+from __future__ import unicode_literals, print_function, division, absolute_import
+from builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Imports
 from collections import OrderedDict
 
 from lokalise_exporter import underscorize
@@ -22,7 +29,7 @@ def read_properties_file_as_dict(file_path, underscorize_keys):
     return properties
 
 
-def write_dict_to_properties_file(dictionary: 'dict', file_path):
+def write_dict_to_properties_file(dictionary, file_path):
     ordered_dictionary = OrderedDict(sorted(dictionary.items()))
     with open(file_path, 'w') as file:
         file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())

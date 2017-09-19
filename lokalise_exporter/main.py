@@ -1,9 +1,19 @@
+# Python 2.x retro-compatibility
+from __future__ import unicode_literals, print_function, division, absolute_import
+from future import standard_library
+
+standard_library.install_aliases()
+
+try:
+    from tempfile import TemporaryDirectory
+except:
+    from backports.tempfile import TemporaryDirectory
+
+# Imports
 import begin
 from requests import post
-from tempfile import TemporaryDirectory
 from os import makedirs, remove
 from time import sleep
-
 from lokalise_exporter import *
 from lokalise_exporter.json_utils import *
 from lokalise_exporter.kotlin_exporter import *
@@ -103,7 +113,7 @@ def export_projects(logger, temp_dir, projects, api_key, export_type, timeout):
     return exported_project_files
 
 
-def unzip_exported_projects(logger, temp_dir, exported_projects: 'list<LokaliseProject>'):
+def unzip_exported_projects(logger, temp_dir, exported_projects):
     unzipped_dirs = []
 
     for project in exported_projects:
@@ -148,7 +158,7 @@ def get_localization_files_to_merge(logger, temp_dir, project_directories):
     return localization_files_to_merge
 
 
-def log_duplicated_keys(logger, localization_file, dict_a: 'dict', dict_b: 'dict'):
+def log_duplicated_keys(logger, localization_file, dict_a, dict_b):
     duplicated_keys = intersect_dict(dict_a, dict_b)
     if duplicated_keys:
         for duplicated_key in duplicated_keys:
@@ -193,15 +203,15 @@ def remove_temp_project_dirs(logger, temp_dir, project_directories):
 
 
 @begin.start(auto_convert=True, lexical_order=True)
-def main(api_key: 'lokalise.co API key',
-         projects_to_export: 'comma separated list of project IDs to be exported',
-         export_type: 'exported format. It can be json, ios, android or kotlin',
-         output_path: 'export absolute path. It will create needed directories' = "",
-         underscorize_localization_keys: 'replaces - and . with _ in all the localization keys' = True,
-         clean_output_path_before_export: 'wipes the output path before exporting new data' = False,
-         debug: 'true to enable debugging output' = False,
-         timeout: 'timeout in seconds for each request' = 10,
-         kotlin_package: 'package of the generated localization keys file' = default_kotlin_package):
+def main(api_key,  # lokalise.co API key
+         projects_to_export,  # comma separated list of project IDs to be exported
+         export_type,  # exported format. It can be json, ios, android or kotlin
+         output_path="",  # export absolute path. It will create needed directories
+         underscorize_localization_keys=True,  # replaces - and . with _ in all the localization keys
+         clean_output_path_before_export=False,  # wipes the output path before exporting new data
+         debug=False,  # true to enable debugging output
+         timeout=10,  # timeout in seconds for each request
+         kotlin_package=default_kotlin_package):  # package of the generated localization keys file
 
     logger = init_logger(debug)
     projects = parse_projects_to_export(projects_to_export)
