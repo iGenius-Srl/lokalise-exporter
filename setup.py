@@ -3,7 +3,8 @@ from setuptools import setup
 setup(name='lokalise-exporter',
       version='0.9',
       description='Export strings from lokalise.co',
-      long_description='Utility tool to export localization strings from lokalise.co for iOS/Android/Frontend/Backend',
+      long_description='Utility tool to export localization strings from one or multiple lokalise.co projects at '
+                       'once for iOS/Android/Frontend/Backend',
       url='https://github.com/gotev/lokalise-exporter',
       author='Aleksandar Gotev',
       author_email='alexgotev@gmail.com',

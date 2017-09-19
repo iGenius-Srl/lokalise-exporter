@@ -1,5 +1,5 @@
 # lokalise-exporter [![PyPI version](https://badge.fury.io/py/lokalise-exporter.svg)](https://badge.fury.io/py/lokalise-exporter)
-Utility tool to export localization strings from lokalise.co for iOS/Android/Frontend/Backend
+Utility tool to export localization strings from one or multiple lokalise.co projects at once for iOS/Android/Frontend/Backend
 
 **If you find a bug or you want to extend functionality, nothing is better than a pull request, otherwise open an issue**
 
