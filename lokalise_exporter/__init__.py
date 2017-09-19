@@ -8,7 +8,7 @@ standard_library.install_aliases()
 try:
     from os import scandir
 except:
-    import scandir as scandir
+    import scandir.scandir as scandir
 
 # Imports
 import zipfile
@@ -51,13 +51,7 @@ def underscorize(value, underscorize_keys):
 
 
 def list_files_in_dir(dir_path):
-    files = []
-
-    for f in scandir(dir_path):
-        if f.is_file():
-            files.append(f)
-
-    return files
+    return [f.name for f in scandir(dir_path) if f.is_file()]
 
 
 def intersect_dict(dict_a, dict_b):
