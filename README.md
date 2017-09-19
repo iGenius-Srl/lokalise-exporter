@@ -30,12 +30,14 @@ pip install lokalise-exporter
 
 #### Python 3
 ```
+xcode-select --install
 brew install python3
 pip3 install lokalise-exporter
 ```
 
 #### Python 2.7.9+
 ```
+xcode-select --install
 brew install python
 pip2 install lokalise-exporter
 ```
