@@ -1,4 +1,4 @@
-# lokalise-exporter
+# lokalise-exporter [![PyPI version](https://badge.fury.io/py/lokalise-exporter.svg)](https://badge.fury.io/py/lokalise-exporter)
 Utility tool to export localization strings from lokalise.co for iOS/Android/Frontend/Backend
 
 **If you find a bug or you want to extend functionality, nothing is better than a pull request, otherwise open an issue**
@@ -57,7 +57,7 @@ where:
 
 #### Example
 ```shell
-lokalise-exporter "API_KEY" "json" "PROJECT1, PROJECT2, PROJECTN" -o "exported"
+lokalise-exporter "API_KEY" "json" "PROJECT1, PROJECT2, PROJECTN" -o "output-directory"
 ```
 
 #### Note
