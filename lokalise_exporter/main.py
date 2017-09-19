@@ -32,7 +32,13 @@ def get_ios_output_localization_file(temp_dir, localization_file):
 
 
 def get_android_output_localization_file(temp_dir, localization_file):
-    localizable_strings_dir = path.join(temp_dir, 'values-' + localization_file.replace('.xml', '').replace('_', '-r'))
+    locale_name = localization_file.replace('.xml', '').replace('_', '-r')
+
+    if locale_name == 'en':
+        localizable_strings_dir = path.join(temp_dir, 'values')
+    else:
+        localizable_strings_dir = path.join(temp_dir, 'values-' + locale_name)
+
     makedirs(localizable_strings_dir)
     return path.join(localizable_strings_dir, 'strings.xml')
 

@@ -136,9 +136,9 @@ output-directory/
 ### android
 ```shell
 output-directory
-├── values-de
+├── values
 │   └── strings.xml
-├── values-en
+├── values-de
 │   └── strings.xml
 ├── values-es
 │   └── strings.xml
