@@ -1,15 +1,16 @@
 from setuptools import setup
 
 setup(name='lokalise-exporter',
-      version='0.8',
+      version='0.9',
       description='Export strings from lokalise.co',
       long_description='Utility tool to export localization strings from lokalise.co for iOS/Android/Frontend/Backend',
       url='https://github.com/gotev/lokalise-exporter',
       author='Aleksandar Gotev',
       author_email='alexgotev@gmail.com',
       license='Apache-2.0',
+      # https://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
-          'Development Status :: 3 - Alpha',
+          'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: Apache Software License',
