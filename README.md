@@ -10,47 +10,61 @@ Utility tool to export localization strings from one or multiple lokalise.co pro
 * [License](#license)
 
 ## Setup
-Compatible with python 2.7.9+. Python3 is highly recommended
+
+Compatible with python 2.7.9+. Python3 is highly recommended.
+
+If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/)
+
+### Python 3
+```
+pip3 install lokalise-exporter
+```
+
+### Python 2.7.9+
 ```
 pip install lokalise-exporter
 ```
 
-If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/)
-
 ### macOS users
-[This reading](https://docs.python.org/3/using/mac.html) may be useful. You may need to install latest python 2 or python 3 with [Homebrew](https://brew.sh/):
+[This reading](https://docs.python.org/3/using/mac.html) may be useful. You may need to install latest python 3 or python 2 with [Homebrew](https://brew.sh/):
+
+#### Python 3
 ```
-brew install python python3
-```
-An then install `lokalise-exporter` with:
-```
-pip2 install lokalise-exporter
-```
-or
-```
+brew install python3
 pip3 install lokalise-exporter
 ```
-depending on which python you want to work.
+
+#### Python 2.7.9+
+```
+brew install python
+pip2 install lokalise-exporter
+```
+
 ### Linux users
 To be able to install `lokalise-exporter` successfully, you need the python development packages.
+
+#### Python 3
+**Ubuntu/Debian**
+```shell
+[sudo] apt-get install python3-dev gcc
+pip3 install lokalise-exporter
+```
+**Fedora/CentOS**
+```shell
+[sudo] yum install python3-devel
+pip3 install lokalise-exporter
+```
 
 #### Python 2
 **Ubuntu/Debian**
 ```shell
 [sudo] apt-get install python-dev gcc
+pip install lokalise-exporter
 ```
 **Fedora/CentOS**
 ```shell
 [sudo] yum install python-devel
-```
-#### Python 3
-**Ubuntu/Debian**
-```shell
-[sudo] apt-get install python3-dev gcc
-```
-**Fedora/CentOS**
-```shell
-[sudo] yum install python3-devel
+pip install lokalise-exporter
 ```
 
 ## Usage
