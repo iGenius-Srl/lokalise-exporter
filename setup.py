@@ -1,5 +1,6 @@
 from setuptools import setup
 
+# https://packaging.python.org/tutorials/distributing-packages
 setup(name='lokalise-exporter',
       version='0.10',
       description='Export strings from lokalise.co',
