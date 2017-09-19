@@ -70,12 +70,7 @@ def copy_files_to_output_directory(logger, clean_output_path_before_export, temp
 
 
 def parse_projects_to_export(input_str):
-    if not input_str or not isinstance(input_str, str):
-        return []
-
-    projects = str(input_str).split(",")
-
-    return [entry.strip() for entry in projects]
+    return [entry.strip() for entry in input_str.split(",")]
 
 
 def download_file(logger, temp_dir, file_to_download, timeout):

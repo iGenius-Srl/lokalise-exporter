@@ -221,7 +221,7 @@ def main(api_key,  # lokalise.co API key
         return -1
 
     logger.debug("Using API Key: %s", api_key)
-    logger.debug("Exporting type: %s", format)
+    logger.debug("Exporting type: %s", export_type)
     logger.debug("Output path: %s", output_path)
     logger.debug("Projects to export: %s", projects)
 
