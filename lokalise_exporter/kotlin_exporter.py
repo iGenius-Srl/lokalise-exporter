@@ -8,7 +8,7 @@ standard_library.install_aliases()
 from collections import OrderedDict
 from os import path
 
-from lokalise_exporter import file_len
+from lokalise_exporter import file_len, write_file
 from lokalise_exporter.properties_utils import read_properties_file_as_dict
 
 default_kotlin_package = "com.yourcompany.yourapp"
@@ -32,7 +32,7 @@ def generate_kotlin_strings_table(logger, temp_dir, localization_files, kotlin_p
     logger.info("Generating kotlin strings table from " + localized_file_to_use + " which has "
                 + str(max_file_len) + " keys")
 
-    with open(path.join(temp_dir, 'LocalizedKeys.kt'), 'w') as kotlin_file:
+    with write_file(path.join(temp_dir, 'LocalizedKeys.kt')) as kotlin_file:
         kotlin_file.writelines([
             'package ' + package + '\n',
             '\n',

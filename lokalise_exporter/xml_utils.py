@@ -8,11 +8,11 @@ standard_library.install_aliases()
 from collections import OrderedDict
 import xmltodict
 
-from lokalise_exporter import underscorize
+from lokalise_exporter import underscorize, read_file, write_file
 
 
 def read_xml_strings_file_as_dict(file_path, underscorize_keys):
-    with open(file_path, 'r') as xml_file:
+    with read_file(file_path) as xml_file:
         xml = xmltodict.parse(xml_file.read())
         strings = xml['resources']['string']
 
@@ -27,7 +27,7 @@ def read_xml_strings_file_as_dict(file_path, underscorize_keys):
 
 def write_dict_to_xml_strings_file(dictionary, file_path):
     ordered_dictionary = OrderedDict(sorted(dictionary.items()))
-    with open(file_path, 'w') as xml_file:
+    with write_file(file_path) as xml_file:
         xml_file.writelines([
             '<?xml version="1.0" encoding="UTF-8"?>\n',
             '<resources>\n'

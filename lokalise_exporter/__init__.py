@@ -17,6 +17,7 @@ from distutils.dir_util import remove_tree, copy_tree
 from requests import get
 from os import path
 from uuid import uuid4
+from codecs import open
 import colorlog
 
 # Custom data types
@@ -102,3 +103,11 @@ def file_len(fname):
         for i, l in enumerate(f):
             pass
     return i + 1
+
+
+def read_file(file_path):
+    return open(file_path, 'r', encoding='utf-8')
+
+
+def write_file(file_path):
+    return open(file_path, 'w', encoding='utf-8')

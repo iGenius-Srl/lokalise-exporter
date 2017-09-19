@@ -7,13 +7,13 @@ standard_library.install_aliases()
 # Imports
 from collections import OrderedDict
 
-from lokalise_exporter import underscorize
+from lokalise_exporter import underscorize, read_file, write_file
 
 
 def read_properties_file_as_dict(file_path, underscorize_keys):
     properties = {}
 
-    with open(file_path, 'r') as prop_file:
+    with read_file(file_path) as prop_file:
         for line in prop_file:
             line = line.rstrip()  # removes trailing whitespace and '\n' chars
 
@@ -31,5 +31,5 @@ def read_properties_file_as_dict(file_path, underscorize_keys):
 
 def write_dict_to_properties_file(dictionary, file_path):
     ordered_dictionary = OrderedDict(sorted(dictionary.items()))
-    with open(file_path, 'w') as prop_file:
+    with write_file(file_path) as prop_file:
         prop_file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())
