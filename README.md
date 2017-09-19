@@ -1,2 +1,82 @@
 # lokalise-exporter
 Utility tool to export localization strings from lokalise.co for iOS/Android/Frontend/Backend
+
+**If you find a bug or you want to extend functionality, nothing is better than a pull request, otherwise open an issue**
+
+## Setup
+Compatible with python 2.7.9+. Python3 is highly recommended
+```
+pip install lokalise-exporter
+```
+
+If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/)
+
+### macOS users
+You may need to install latest python 2 or python 3 with:
+```
+brew install python python3
+```
+An then install it with:
+```
+pip2 install lokalise-exporter
+```
+or
+```
+pip3 install lokalise-exporter
+```
+### Linux users
+To be able to install `lokalise-exporter` successfully, you need the python development packages.
+
+#### Python 2
+**Ubuntu/Debian**
+```shell
+[sudo] apt-get install python-dev
+```
+**Fedora/CentOS**
+```shell
+[sudo] yum install python-devel
+```
+#### Python 3
+**Ubuntu/Debian**
+```shell
+[sudo] apt-get install python3-dev
+```
+**Fedora/CentOS**
+```shell
+[sudo] yum install python3-devel
+```
+
+## Usage
+```shell
+lokalise-exporter "API_KEY" "FORMAT" "PROJECTS_TO_EXPORT" -o "OUTPUT_DIR"
+```
+where:
+* **API_KEY** is your lokalise.co API key. You can get it from [API Tokens page](https://lokalise.co/account/#apitokens)
+* **FORMAT** is the export format. Supported formats are `json`, `android`, `ios`, `kotlin`
+* **PROJECTS_TO_EXPORT** is a string containing the project IDs to export, separated by a comma. You can get each project's ID from its settings page on lokalise.
+
+Run `lokalise-exporter -h` to see all the supported parameters.
+
+#### Optional parameters
+* **--debug** to enable debug log. Useful if something goes wrong or if you spot a bug.
+* **--timeout** or **-t** to specify the timeout in seconds for each API request to lokalise. By default it's set to 10s. Example: `-t 15` to set 15s of timeout.
+* **--clean-output-path-before-export** to remove everything from the output directory before writing exported files. By **default** nothing gets deleted from the output directory.
+* **--no-underscorize-localization-keys** by default, the exporter replaces `-` and `.` with `_` in all the localization keys. This is because Android exporter needs this by default, and the exporter does this automatically to provide cross-platform consistency of everything which gets exported. Pass this argument if you want to keep original localization key names instead. Bear in mind that this flag gets ignored when exporting for Android.
+* **--kotlin_package** or **-k** to provide the package name of the strings table file when exporting for `kotlin`. By default it's set to `com.yourcompany.yourapp`.
+
+## License <a name="license"></a>
+
+    Copyright (C) 2017 Aleksandar Gotev
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

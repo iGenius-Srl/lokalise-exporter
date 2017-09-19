@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='lokalise-exporter',
-      version='0.7',
+      version='0.8',
       description='Export strings from lokalise.co',
       long_description='Utility tool to export localization strings from lokalise.co for iOS/Android/Frontend/Backend',
       url='https://github.com/gotev/lokalise-exporter',
@@ -37,5 +37,5 @@ setup(name='lokalise-exporter',
       install_requires=['requests', 'begins', 'colorlog', 'xmltodict', 'future',
                         'backports.tempfile;python_version<"3.2"',
                         'scandir;python_version<"3.5"'],
-      python_requires='>=2.7, <4',
+      python_requires='>=2.7.9, <4',
       zip_safe=False)

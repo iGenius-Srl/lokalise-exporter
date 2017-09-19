@@ -27,13 +27,13 @@ def read_xml_strings_file_as_dict(file_path, underscorize_keys):
 
 def write_dict_to_xml_strings_file(dictionary, file_path):
     ordered_dictionary = OrderedDict(sorted(dictionary.items()))
-    with open(file_path, 'w') as file:
-        file.writelines([
+    with open(file_path, 'w') as xml_file:
+        xml_file.writelines([
             '<?xml version="1.0" encoding="UTF-8"?>\n',
             '<resources>\n'
         ])
 
-        file.writelines('  <string name="{}">{}</string>\n'.format(key, value)
+        xml_file.writelines('  <string name="{}">{}</string>\n'.format(key, value)
                         for key, value in ordered_dictionary.items())
 
-        file.writelines('</resources>\n')
+        xml_file.writelines('</resources>\n')

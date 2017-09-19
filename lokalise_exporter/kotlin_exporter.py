@@ -23,17 +23,17 @@ def generate_kotlin_strings_table(logger, temp_dir, localization_files, kotlin_p
     max_file_len = 0
     localized_file_to_use = ''
 
-    for file in localization_files:
-        length = file_len(file)
+    for kotlin_file in localization_files:
+        length = file_len(kotlin_file)
         if length > max_file_len:
             max_file_len = length
-            localized_file_to_use = file
+            localized_file_to_use = kotlin_file
 
     logger.info("Generating kotlin strings table from " + localized_file_to_use + " which has "
                 + str(max_file_len) + " keys")
 
-    with open(path.join(temp_dir, 'LocalizedKeys.kt'), 'w') as file:
-        file.writelines([
+    with open(path.join(temp_dir, 'LocalizedKeys.kt'), 'w') as kotlin_file:
+        kotlin_file.writelines([
             'package ' + package + '\n',
             '\n',
             'class LocalizedKeys {\n',
@@ -43,9 +43,9 @@ def generate_kotlin_strings_table(logger, temp_dir, localization_files, kotlin_p
 
         loc_keys = read_properties_file_as_dict(localized_file_to_use, underscorize_keys)
         ordered_keys = OrderedDict(sorted(loc_keys.items()))
-        file.writelines(['        @JvmField val ' + key + ' = "' + key + '"\n' for key in ordered_keys])
+        kotlin_file.writelines(['        @JvmField val ' + key + ' = "' + key + '"\n' for key in ordered_keys])
 
-        file.writelines([
+        kotlin_file.writelines([
             '\n',
             '    }\n',
             '}\n'

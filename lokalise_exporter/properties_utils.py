@@ -13,8 +13,8 @@ from lokalise_exporter import underscorize
 def read_properties_file_as_dict(file_path, underscorize_keys):
     properties = {}
 
-    with open(file_path, 'r') as file:
-        for line in file:
+    with open(file_path, 'r') as prop_file:
+        for line in prop_file:
             line = line.rstrip()  # removes trailing whitespace and '\n' chars
 
             if line.startswith("#") or "=" not in line:
@@ -31,5 +31,5 @@ def read_properties_file_as_dict(file_path, underscorize_keys):
 
 def write_dict_to_properties_file(dictionary, file_path):
     ordered_dictionary = OrderedDict(sorted(dictionary.items()))
-    with open(file_path, 'w') as file:
-        file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())
+    with open(file_path, 'w') as prop_file:
+        prop_file.writelines('{} = {}\n'.format(key, value) for key, value in ordered_dictionary.items())

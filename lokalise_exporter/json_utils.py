@@ -25,5 +25,5 @@ def read_json_file_as_dict(file_path, underscorize_keys):
 
 
 def write_dict_to_json_file(dictionary, file_path):
-    with open(file_path, 'w') as output:
-        json.dump(dictionary, output, sort_keys=True, indent=2)
+    with open(file_path, 'w') as json_file:
+        json.dump(dictionary, json_file, sort_keys=True, indent=2)

@@ -85,9 +85,9 @@ def download_file(logger, temp_dir, file_to_download, timeout):
     download_request = get(file_to_download, stream=True, timeout=timeout)
 
     if download_request.status_code == 200:
-        with open(download_path, 'wb') as file:
+        with open(download_path, 'wb') as output_file:
             for chunk in download_request.iter_content(1024):
-                file.write(chunk)
+                output_file.write(chunk)
         logger.debug("Downloaded %s in %s", file_to_download, download_path)
         return download_path
 
