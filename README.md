@@ -3,6 +3,12 @@ Utility tool to export localization strings from lokalise.co for iOS/Android/Fro
 
 **If you find a bug or you want to extend functionality, nothing is better than a pull request, otherwise open an issue**
 
+### Index
+* [Setup](#setup)
+* [Usage](#usage)
+* [Export formats](#export-formats)
+* [License](#license)
+
 ## Setup
 Compatible with python 2.7.9+. Python3 is highly recommended
 ```
@@ -53,7 +59,7 @@ lokalise-exporter "API_KEY" "FORMAT" "PROJECTS_TO_EXPORT" -o "OUTPUT_DIR"
 ```
 where:
 * **API_KEY** is your lokalise.co API key. You can get it from [API Tokens page](https://lokalise.co/account/#apitokens)
-* **FORMAT** is the export format. Supported formats are `json`, `android`, `ios`, `kotlin`
+* **FORMAT** is the export format. Supported formats are `json`, `android`, `ios`, `kotlin`. Look [here](#export-formats)
 * **PROJECTS_TO_EXPORT** is a string containing the project IDs to export, separated by a comma. You can get each project's ID from its settings page on lokalise. For each language, you will get a single file containing all the localization strings from all the projects. In case of duplicates, you will see an error message in the console output, but the process would not fail.
 
 #### Example
