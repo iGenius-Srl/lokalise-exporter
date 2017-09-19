@@ -9,7 +9,7 @@ from lokalise_exporter import read_file, underscorize, write_file
 import json
 
 
-def read_json_file_as_dict(file_path, underscorize_keys):
+def read_json_file_as_dict(logger, file_path, underscorize_keys):
     with read_file(file_path) as json_file:
         data = json.load(json_file, encoding='utf-8')
 
@@ -19,11 +19,16 @@ def read_json_file_as_dict(file_path, underscorize_keys):
         value = str(data[key]).strip()
 
         key = underscorize(key, underscorize_keys)
-        data_out[key] = value
+        value = value.strip()
+
+        if len(value) == 0:
+            logger.error("Skipped key " + key + " from " + file_path + " because it's empty!!")
+        else:
+            data_out[key] = value.strip()
 
     return data_out
 
 
 def write_dict_to_json_file(dictionary, file_path):
     with write_file(file_path) as json_file:
-        json.dump(dictionary, json_file, sort_keys=True, indent=2)
+        json.dump(dictionary, json_file, sort_keys=True, indent=2, ensure_ascii=False)

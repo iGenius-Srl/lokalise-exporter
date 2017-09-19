@@ -10,7 +10,7 @@ from collections import OrderedDict
 from lokalise_exporter import underscorize, read_file, write_file
 
 
-def read_properties_file_as_dict(file_path, underscorize_keys):
+def read_properties_file_as_dict(logger, file_path, underscorize_keys):
     properties = {}
 
     with read_file(file_path) as prop_file:
@@ -22,9 +22,12 @@ def read_properties_file_as_dict(file_path, underscorize_keys):
 
             key, value = line.split("=", 1)
             key = underscorize(key, underscorize_keys)
-            value = str(value).strip()
+            value = value.strip()
 
-            properties[key] = value
+            if len(value) == 0:
+                logger.error("Skipped key " + key + " from " + file_path + " because it's empty!!")
+            else:
+                properties[key] = value.strip()
 
     return properties
 

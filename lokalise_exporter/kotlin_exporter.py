@@ -41,7 +41,7 @@ def generate_kotlin_strings_table(logger, temp_dir, localization_files, kotlin_p
             '\n'
         ])
 
-        loc_keys = read_properties_file_as_dict(localized_file_to_use, underscorize_keys)
+        loc_keys = read_properties_file_as_dict(logger, localized_file_to_use, underscorize_keys)
         ordered_keys = OrderedDict(sorted(loc_keys.items()))
         kotlin_file.writelines(['        @JvmField val ' + key + ' = "' + key + '"\n' for key in ordered_keys])
 

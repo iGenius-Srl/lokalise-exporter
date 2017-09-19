@@ -178,7 +178,7 @@ def merge_localizations(logger, temp_dir, export_type, localization_files_to_mer
         for project_dir in localization_files_to_merge[localization_file]:
             file_path = path.join(temp_dir, project_dir, localization_file)
             logger.debug("Reading localization keys from " + file_path)
-            new_keys = export_types[export_type]['file_reader_fn'](file_path, underscorize_localization_keys)
+            new_keys = export_types[export_type]['file_reader_fn'](logger, file_path, underscorize_localization_keys)
             log_duplicated_keys(logger, localization_file, localization_keys, new_keys)
             localization_keys.update(new_keys)
             logger.debug("Removing " + file_path)

@@ -11,7 +11,7 @@ import xmltodict
 from lokalise_exporter import underscorize, read_file, write_file
 
 
-def read_xml_strings_file_as_dict(file_path, underscorize_keys):
+def read_xml_strings_file_as_dict(logger, file_path, underscorize_keys):
     with read_file(file_path) as xml_file:
         xml = xmltodict.parse(xml_file.read())
         strings = xml['resources']['string']
@@ -20,7 +20,11 @@ def read_xml_strings_file_as_dict(file_path, underscorize_keys):
 
         for string in strings:
             key = underscorize(string['@name'], underscorize_keys)
-            dictionary[key] = string['#text']
+
+            if '#text' not in string:
+                logger.error("Skipped key " + key + " from " + file_path + " because it's empty!!")
+            else:
+                dictionary[key] = string['#text']
 
         return dictionary
 
