@@ -37,7 +37,7 @@ To be able to install `lokalise-exporter` successfully, you need the python deve
 #### Python 2
 **Ubuntu/Debian**
 ```shell
-[sudo] apt-get install python-dev
+[sudo] apt-get install python-dev gcc
 ```
 **Fedora/CentOS**
 ```shell
@@ -46,7 +46,7 @@ To be able to install `lokalise-exporter` successfully, you need the python deve
 #### Python 3
 **Ubuntu/Debian**
 ```shell
-[sudo] apt-get install python3-dev
+[sudo] apt-get install python3-dev gcc
 ```
 **Fedora/CentOS**
 ```shell
