@@ -3,7 +3,7 @@ Utility tool to export localization strings from one or multiple lokalise.co pro
 
 **If you find a bug or you want to extend functionality, nothing is better than a pull request, otherwise open an issue**
 
-### Index
+## Index
 * [Setup](#setup)
 * [Usage](#usage)
 * [Export formats](#export-formats)
