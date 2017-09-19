@@ -12,11 +12,11 @@ pip install lokalise-exporter
 If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/)
 
 ### macOS users
-You may need to install latest python 2 or python 3 with:
+[This reading](https://docs.python.org/3/using/mac.html) may be useful. You may need to install latest python 2 or python 3 with [Homebrew](https://brew.sh/):
 ```
 brew install python python3
 ```
-An then install it with:
+An then install `lokalise-exporter` with:
 ```
 pip2 install lokalise-exporter
 ```
@@ -24,6 +24,7 @@ or
 ```
 pip3 install lokalise-exporter
 ```
+depending on which python you want to work.
 ### Linux users
 To be able to install `lokalise-exporter` successfully, you need the python development packages.
 
