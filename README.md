@@ -77,6 +77,68 @@ lokalise-exporter "API_KEY" "json" "PROJECT1, PROJECT2, PROJECTN" -o "exported"
 * **--no-underscorize-localization-keys** by default, the exporter replaces `-` and `.` with `_` in all the localization keys. This is because Android exporter needs this by default, and the exporter does this automatically to provide cross-platform consistency of everything which gets exported. Pass this argument if you want to keep original localization key names instead. Bear in mind that this flag gets ignored when exporting for Android.
 * **--kotlin_package** or **-k** to provide the package name of the strings table file when exporting for `kotlin`. By default it's set to `com.yourcompany.yourapp`.
 
+## Export formats
+This is what you will get in your output directory.
+
+The following examples are based on an exported project with the following languages: de, en, es, fr, it, pt_BR
+
+### json
+```shell
+output-directory/
+├── de.json
+├── en.json
+├── es.json
+├── fr.json
+├── it.json
+└── pt_BR.json
+```
+
+### ios
+```shell
+output-directory/
+├── de.lproj
+│   └── Localizable.strings
+├── en.lproj
+│   └── Localizable.strings
+├── es.lproj
+│   └── Localizable.strings
+├── fr.lproj
+│   └── Localizable.strings
+├── it.lproj
+│   └── Localizable.strings
+└── pt-BR.lproj
+    └── Localizable.strings
+```
+
+### android
+```shell
+output-directory
+├── values-de
+│   └── strings.xml
+├── values-en
+│   └── strings.xml
+├── values-es
+│   └── strings.xml
+├── values-fr
+│   └── strings.xml
+├── values-it
+│   └── strings.xml
+└── values-pt-rBR
+    └── strings.xml
+```
+
+### kotlin
+```shell
+output-directory/
+├── LocalizedKeys.kt
+├── de.properties
+├── en.properties
+├── es.properties
+├── fr.properties
+├── it.properties
+└── pt_BR.properties
+```
+
 ## License <a name="license"></a>
 
     Copyright (C) 2017 Aleksandar Gotev
