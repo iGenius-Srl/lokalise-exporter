@@ -8,7 +8,7 @@ standard_library.install_aliases()
 try:
     from os import scandir
 except:
-    import scandir.scandir as scandir
+    from scandir import scandir
 
 # Imports
 import zipfile
