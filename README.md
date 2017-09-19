@@ -15,12 +15,12 @@ Compatible with python 2.7.9+. Python3 is highly recommended.
 
 If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/)
 
-### Python 3
+#### Python 3
 ```
 pip3 install lokalise-exporter
 ```
 
-### Python 2.7.9+
+#### Python 2.7.9+
 ```
 pip install lokalise-exporter
 ```
