@@ -51,7 +51,13 @@ def underscorize(value, underscorize_keys):
 
 
 def list_files_in_dir(dir_path):
-    return [f.name for f in scandir(dir_path) if f.is_file()]
+    files = []
+
+    for f in scandir(dir_path):
+        if f.is_file():
+            files.append(f)
+
+    return files
 
 
 def intersect_dict(dict_a, dict_b):
