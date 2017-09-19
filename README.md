@@ -55,6 +55,11 @@ where:
 * **FORMAT** is the export format. Supported formats are `json`, `android`, `ios`, `kotlin`
 * **PROJECTS_TO_EXPORT** is a string containing the project IDs to export, separated by a comma. You can get each project's ID from its settings page on lokalise. For each language, you will get a single file containing all the localization strings from all the projects. In case of duplicates, you will see an error message in the console output, but the process would not fail.
 
+#### Example
+```shell
+lokalise-exporter "API_KEY" "json" "PROJECT1, PROJECT2, PROJECTN" -o "exported"
+```
+
 #### Note
 the exporter works in a temporary directory, which gets automatically cleaned after either success or failure.
  
@@ -64,11 +69,6 @@ Exported files are written in the specified output directory only if the process
 * there are some errors in some of your lokalise projects
 
 You will still have the last successful export available in your output directory, making this tool ideal to include in your CI or build phases.
-
-Example:
-```shell
-lokalise-exporter "API_KEY" "json" "PROJECT1, PROJECT2, PROJECTN" -o "exported"
-```
 
 #### Optional parameters
 * **--debug** to enable debug log. Useful if something goes wrong or if you spot a bug.
