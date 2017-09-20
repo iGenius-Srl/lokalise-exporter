@@ -93,7 +93,7 @@ Exported files are written in the specified output directory only if the process
 
 You will still have the last successful export available in your output directory, making this tool ideal to include in your CI or build phases.
 
-### Default behaviour
+#### Default behaviour
 * Empty strings are not exported from lokalise. If you don't see a key in the export, it's not a bug, ask the translators.
 * All the localization strings are trimmed (both keys and values). If after the trim a localization key value becomes empty, the key is discarded from the export. `E.g. some_key = "   " ---> some_key = "" ---> discarded and logged`
 * A localization key like `some-localization.string_key` becomes `some_localization_string_key` to prevent typos in your code. If you want to have `some-localization.string_key` instead, add `--no-underscorize-localization-keys` (read through)
