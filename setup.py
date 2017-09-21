@@ -2,7 +2,7 @@ from setuptools import setup
 
 # https://packaging.python.org/tutorials/distributing-packages
 setup(name='lokalise-exporter',
-      version='0.13',
+      version='0.14',
       description='Export strings from lokalise.co',
       long_description='Utility tool to export localization strings from one or multiple lokalise.co projects at '
                        'once for iOS/Android/Frontend/Backend',
@@ -37,7 +37,7 @@ setup(name='lokalise-exporter',
           # This has to be like this because of begins package for command line parsing
           'console_scripts': ['lokalise-exporter=lokalise_exporter.main:main.start'],
       },
-      install_requires=['requests', 'begins', 'colorlog', 'xmltodict', 'future',
+      install_requires=['requests', 'begins', 'colorlog', 'xmltodict', 'future', 'chardet',
                         'backports.tempfile;python_version<"3.2"',
                         'scandir;python_version<"3.5"'],
       python_requires='>=2.7.9, <4',

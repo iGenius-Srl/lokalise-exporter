@@ -54,7 +54,7 @@ export_types = {
 
     'ios': {
         'lokalise_type': 'strings',
-        'file_reader_fn': read_properties_file_as_dict,
+        'file_reader_fn': read_strings_file_as_dict,
         'output_localization_file_path_fn': get_ios_output_localization_file,
         'file_writer_fn': write_dict_to_properties_file
     },

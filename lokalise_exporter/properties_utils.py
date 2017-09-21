@@ -27,7 +27,7 @@ def read_properties_file_as_dict(logger, file_path, underscorize_keys):
             if len(value) == 0:
                 logger.error("Skipped key " + key + " from " + file_path + " because it's empty!!")
             else:
-                properties[key] = value.strip()
+                properties[key] = value
 
     return properties
 
