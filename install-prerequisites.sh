@@ -28,6 +28,8 @@ if [ "$(uname)" == "Darwin" ]; then
 
   if ! type "lokalise-exporter" 2> /dev/null; then
     pip3 install lokalise-exporter
+  else
+    pip3 install lokalise-exporter --upgrade
   fi
 
 else
@@ -42,6 +44,8 @@ else
 
   if ! type "lokalise-exporter" 2> /dev/null; then
     pip install lokalise-exporter
+  else
+    pip install lokalise-exporter --upgrade
   fi
 
 fi
