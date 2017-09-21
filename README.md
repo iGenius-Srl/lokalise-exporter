@@ -13,7 +13,11 @@ Utility tool to export localization strings from one or multiple lokalise.co pro
 
 Compatible with python 2.7.9+. Python3 is highly recommended.
 
-If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/)
+If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/). If you want a simple one-line-do-it-all install script, if you're on a macOS or linux, just copy and paste this in your command line:
+
+```shell
+curl -L "https://raw.githubusercontent.com/gotev/lokalise-exporter/master/install-prerequisites.sh" | bash
+```
 
 #### Python 3
 ```
