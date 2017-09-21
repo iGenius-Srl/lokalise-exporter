@@ -2,6 +2,8 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 from future import standard_library
 
+from lokalise_exporter.strings_util import read_strings_file_as_dict
+
 standard_library.install_aliases()
 
 try:
