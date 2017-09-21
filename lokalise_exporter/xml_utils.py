@@ -24,7 +24,11 @@ def read_xml_strings_file_as_dict(logger, file_path, underscorize_keys):
             if '#text' not in string:
                 logger.error("Skipped key " + key + " from " + file_path + " because it's empty!!")
             else:
-                dictionary[key] = string['#text']
+                value = string['#text'].strip()
+                if len(value) == 0:
+                    logger.error("Skipped key " + key + " from " + file_path + " because it's empty!!")
+                else:
+                    dictionary[key] = escape_xml_value(value)
 
         return dictionary
 
@@ -41,3 +45,19 @@ def write_dict_to_xml_strings_file(dictionary, file_path):
                         for key, value in ordered_dictionary.items())
 
         xml_file.writelines('</resources>\n')
+
+
+def escape_xml_value(text):
+    if "&" in text:
+        text = text.replace("&", "&amp;")
+    if "<" in text:
+        text = text.replace("<", "&lt;")
+    if ">" in text:
+        text = text.replace(">", "&gt;")
+    if "\"" in text:
+        text = text.replace("\"", "&quot;")
+    elif "'" in text:
+        text = text.replace("'", "&quot;")
+    if "\n" in text:
+        text = text.replace("\n", "&#10;")
+    return text.encode('utf-8', "xmlcharrefreplace").decode('utf-8')
