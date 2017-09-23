@@ -183,7 +183,7 @@ output-directory/
 If you do that, the generated Kotlin code allows you to do the following everywhere in your code:
 
 ```kotlin
-LocalizedKeys.some_localization_key.localized("language") // in this example langiage can be: de, en, es, fr, it, pt_BR
+LocalizedKeys.some_localization_key.localized("language") // in this example language can be: de, en, es, fr, it, pt_BR
 ```
 
 and also:
