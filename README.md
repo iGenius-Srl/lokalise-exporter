@@ -161,7 +161,7 @@ output-directory
 
 ### kotlin
 For kotlin, the recommended setting for output directory (`-o` argument) is the `src/main` directory of your kotlin
-project. To specify the package name of the `LokalizedKeys.kt`, use the `-k` option as explained in the usage section.
+project. To specify the package name of the `LocalizedKeys.kt`, use the `-k` option as explained in the usage section.
 
 ```shell
 output-directory/
