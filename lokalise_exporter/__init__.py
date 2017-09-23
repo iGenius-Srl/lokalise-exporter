@@ -14,6 +14,7 @@ except:
 import zipfile
 from collections import namedtuple
 from distutils.dir_util import remove_tree, copy_tree
+from pkg_resources import resource_string
 from requests import get
 from os import path
 from uuid import uuid4
@@ -111,3 +112,10 @@ def read_file(file_path):
 
 def write_file(file_path):
     return open(file_path, 'w', encoding='utf-8')
+
+
+def read_template(name):
+    resource_package = __name__
+    resource_path = '/'.join(('templates', name))
+
+    return resource_string(resource_package, resource_path).decode('utf-8')

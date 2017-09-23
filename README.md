@@ -160,16 +160,42 @@ output-directory
 ```
 
 ### kotlin
+For kotlin, the recommended setting for output directory (`-o` argument) is the `src/main` directory of your kotlin
+project. To specify the package name of the `LokalizedKeys.kt`, use the `-k` option as explained in the usage section.
+
 ```shell
 output-directory/
-├── LocalizedKeys.kt
-├── de.properties
-├── en.properties
-├── es.properties
-├── fr.properties
-├── it.properties
-└── pt_BR.properties
+├── kotlin
+│   └── com
+│       └── yourcompany
+│           └── yourapp
+│               └── LocalizedKeys.kt
+└── resources
+    └── locale
+        ├── de.properties
+        ├── en.properties
+        ├── es.properties
+        ├── fr.properties
+        ├── it.properties
+        └── pt_BR.properties
 ```
+
+If you do that, the generated Kotlin code allows you to do the following everywhere in your code:
+
+```kotlin
+LocalizedKeys.some_localization_key.localized("language") // in this example langiage can be: de, en, es, fr, it, pt_BR
+```
+
+and also:
+
+```kotlin
+"some_localization_key".localized("language")
+```
+
+There's a second optional argument to `localized` function which specifies the default language to which to fallback if you
+request a localization string which is not present in the requested language. By default it's `en`. 
+
+So for example, if you use `default="en"` and request the key `some_key` in language `de` which is not present in `de.properties` but it's contained in `en.properties`, you will get the value of `some_key` from `en.properties`.
 
 ## License <a name="license"></a>
 

@@ -27,9 +27,15 @@ def get_output_localization_file(temp_dir, localization_file):
     return path.join(temp_dir, localization_file)
 
 
+def get_kotlin_output_localization_file(temp_dir, localization_file):
+    localizable_locale_dir = path.join(temp_dir, 'resources', 'locale')
+    makedirs(localizable_locale_dir, exist_ok=True)
+    return path.join(localizable_locale_dir, localization_file)
+
+
 def get_ios_output_localization_file(temp_dir, localization_file):
     localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
-    makedirs(localizable_strings_dir)
+    makedirs(localizable_strings_dir, exist_ok=True)
     return path.join(localizable_strings_dir, 'Localizable.strings')
 
 
@@ -41,7 +47,7 @@ def get_android_output_localization_file(temp_dir, localization_file):
     else:
         localizable_strings_dir = path.join(temp_dir, 'values-' + locale_name)
 
-    makedirs(localizable_strings_dir)
+    makedirs(localizable_strings_dir, exist_ok=True)
     return path.join(localizable_strings_dir, 'strings.xml')
 
 
@@ -64,7 +70,7 @@ export_types = {
     'kotlin': {
         'lokalise_type': 'properties',
         'file_reader_fn': read_properties_file_as_dict,
-        'output_localization_file_path_fn': get_output_localization_file,
+        'output_localization_file_path_fn': get_kotlin_output_localization_file,
         'file_writer_fn': write_dict_to_properties_file
     },
 

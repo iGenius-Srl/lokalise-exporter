@@ -2,13 +2,15 @@
 from __future__ import unicode_literals, print_function, division, absolute_import
 from builtins import *
 from future import standard_library
+from string import Template
+
 standard_library.install_aliases()
 
 # Imports
 from collections import OrderedDict
-from os import path
+from os import path, makedirs
 
-from lokalise_exporter import file_len, write_file
+from lokalise_exporter import file_len, write_file, read_template
 from lokalise_exporter.properties_utils import read_properties_file_as_dict
 
 default_kotlin_package = "com.yourcompany.yourapp"
@@ -32,11 +34,18 @@ def generate_kotlin_strings_table(logger, temp_dir, localization_files, kotlin_p
     logger.info("Generating kotlin strings table from " + localized_file_to_use + " which has "
                 + str(max_file_len) + " keys")
 
-    with write_file(path.join(temp_dir, 'LocalizedKeys.kt')) as kotlin_file:
+    package_dir = package.replace('.', path.sep)
+    out_dir = path.join(temp_dir, 'kotlin', package_dir)
+    makedirs(out_dir)
+
+    generated_file_name = 'LocalizedKeys.kt'
+
+    with write_file(path.join(out_dir, generated_file_name)) as kotlin_file:
+        template = read_template(generated_file_name).replace('$package', package)
+        kotlin_file.write(template)
+
         kotlin_file.writelines([
-            'package ' + package + '\n',
-            '\n',
-            'class LocalizedKeys {\n',
+            '\nclass LocalizedKeys {\n',
             '    companion object {\n',
             '\n'
         ])
