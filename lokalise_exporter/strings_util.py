@@ -7,6 +7,7 @@ Apple strings file handler/compiler
 from __future__ import absolute_import
 import codecs, re, chardet
 
+from lokalise_exporter import underscorize
 
 """
 Handler for Apple STRINGS translation files.
