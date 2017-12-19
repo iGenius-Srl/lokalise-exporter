@@ -2,7 +2,7 @@ from setuptools import setup
 
 # https://packaging.python.org/tutorials/distributing-packages
 setup(name='lokalise-exporter',
-      version='0.17',
+      version='0.18',
       description='Export strings from lokalise.co',
       long_description='Utility tool to export localization strings from one or multiple lokalise.co projects at '
                        'once for iOS/Android/Frontend/Backend',
