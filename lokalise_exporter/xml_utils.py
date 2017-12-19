@@ -57,7 +57,7 @@ def escape_xml_value(text):
     if "\"" in text:
         text = text.replace("\"", "&quot;")
     elif "'" in text:
-        text = text.replace("'", "&apos;")
+        text = text.replace("'", "&#39;")
     if "\n" in text:
         text = text.replace("\n", "&#10;")
     return text.encode('utf-8', "xmlcharrefreplace").decode('utf-8')
