@@ -34,7 +34,8 @@ def get_kotlin_output_localization_file(temp_dir, localization_file):
 
 
 def get_ios_output_localization_file(temp_dir, localization_file):
-    localizable_strings_dir = path.join(temp_dir, localization_file.replace('.strings', '.lproj'))
+    localizable_strings_dir = path.join(
+        temp_dir, localization_file.replace('.strings', '.lproj'))
     makedirs(localizable_strings_dir, exist_ok=True)
     return path.join(localizable_strings_dir, 'Localizable.strings')
 
@@ -87,27 +88,32 @@ export_types = {
 def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
     logger.info("Exporting project %s", project_id)
 
-    endpoint = "https://lokalise.co/api/project/export"
+    endpoint = f"https://api.lokalise.co/api2/projects/{project_id}/files/download"
     post_params = {
-        'id': project_id,
-        'api_token': api_key,
-        'type': export_types[export_type]['lokalise_type'],
+        'format': export_types[export_type]['lokalise_type'],
         'bundle_structure': '%LANG_ISO%.%FORMAT%',
-        'export_empty': 'skip'
+        'export_empty': 'skip',
+        'original_filenames': False
     }
-
+    headers = {
+        'content-type': "application/json",
+        'x-api-token': api_key
+    }
     logger.debug("Sending POST %s with data: %s", endpoint, post_params)
 
-    response = post(endpoint, data=post_params, timeout=timeout).json()
+    response = post(endpoint, json=post_params,
+                    timeout=timeout, headers=headers).json()
 
-    if response['response']['status'] == 'error':
-        resp = response['response']
-        raise RuntimeError("lokalise error " + str(resp['code']) + ": " + resp['message'])
+    if 'error' in response:
+        resp = response
+        raise RuntimeError("lokalise error " + str(resp['error']['message']))
 
-    file_to_download = "https://s3-eu-west-1.amazonaws.com/lokalise-assets/" + response['bundle']['file']
-    logger.debug("project %s will be exported from %s", project_id, file_to_download)
+    file_to_download = response['bundle_url']
+    logger.debug("project %s will be exported from %s",
+                 project_id, file_to_download)
 
-    downloaded_file = download_file(logger, temp_dir, file_to_download, timeout)
+    downloaded_file = download_file(
+        logger, temp_dir, file_to_download, timeout)
     logger.info("Project %s exported", project_id)
 
     return LokaliseProject(projectID=project_id, zippedFileName=downloaded_file)
@@ -117,12 +123,9 @@ def export_projects(logger, temp_dir, projects, api_key, export_type, timeout):
     exported_project_files = []
 
     for index, project in enumerate(projects):
-        exported_project = export_project(logger, temp_dir, api_key, project, export_type, timeout)
+        exported_project = export_project(
+            logger, temp_dir, api_key, project, export_type, timeout)
         exported_project_files.append(exported_project)
-
-        if not index == len(projects) - 1:
-            logger.info("Waiting 5s because of the lokalise.co flood detector, please be patient ...")
-            sleep(5)
 
     return exported_project_files
 
@@ -138,7 +141,8 @@ def unzip_exported_projects(logger, temp_dir, exported_projects):
         remove(project.zippedFileName)
         unzipped_dirs.append(project.projectID)
 
-        logger.debug("Unzipped " + project.zippedFileName + " in " + unzipped_dir)
+        logger.debug("Unzipped " + project.zippedFileName +
+                     " in " + unzipped_dir)
 
     return unzipped_dirs
 
@@ -192,14 +196,18 @@ def merge_localizations(logger, temp_dir, export_type, localization_files_to_mer
         for project_dir in localization_files_to_merge[localization_file]:
             file_path = path.join(temp_dir, project_dir, localization_file)
             logger.debug("Reading localization keys from " + file_path)
-            new_keys = export_types[export_type]['file_reader_fn'](logger, file_path, underscorize_localization_keys)
-            log_duplicated_keys(logger, localization_file, localization_keys, new_keys)
+            new_keys = export_types[export_type]['file_reader_fn'](
+                logger, file_path, underscorize_localization_keys)
+            log_duplicated_keys(logger, localization_file,
+                                localization_keys, new_keys)
             localization_keys.update(new_keys)
             logger.debug("Removing " + file_path)
             remove(file_path)
 
-        localization_path = export_types[export_type]['output_localization_file_path_fn'](temp_dir, localization_file)
-        export_types[export_type]['file_writer_fn'](localization_keys, localization_path)
+        localization_path = export_types[export_type]['output_localization_file_path_fn'](
+            temp_dir, localization_file)
+        export_types[export_type]['file_writer_fn'](
+            localization_keys, localization_path)
         localization_files.append(localization_path)
 
     if export_type == 'kotlin':
@@ -221,8 +229,10 @@ def main(api_key,  # lokalise.co API key
          projects_to_export,  # comma separated list of project IDs to be exported
          export_type,  # exported format. It can be json, ios, android or kotlin
          output_path="",  # export absolute path. It will create needed directories
-         underscorize_localization_keys=True,  # replaces - and . with _ in all the localization keys
-         clean_output_path_before_export=False,  # wipes the output path before exporting new data
+         # replaces - and . with _ in all the localization keys
+         underscorize_localization_keys=True,
+         # wipes the output path before exporting new data
+         clean_output_path_before_export=False,
          debug=False,  # true to enable debugging output
          timeout=10,  # timeout in seconds for each request
          kotlin_package=default_kotlin_package):  # package of the generated localization keys file
@@ -231,7 +241,8 @@ def main(api_key,  # lokalise.co API key
     projects = parse_projects_to_export(projects_to_export)
 
     if export_type not in export_types:
-        logger.error("export_type must be one of the following: %s", ",".join(export_types.keys()))
+        logger.error("export_type must be one of the following: %s",
+                     ",".join(export_types.keys()))
         return -1
 
     logger.debug("Using API Key: %s", api_key)
@@ -241,20 +252,25 @@ def main(api_key,  # lokalise.co API key
 
     try:
         with TemporaryDirectory(prefix="lokalise-exporter") as temp_dir:
-            exported_project_files = export_projects(logger, temp_dir, projects, api_key, export_type, timeout)
-            project_directories = unzip_exported_projects(logger, temp_dir, exported_project_files)
-            localization_files_to_merge = get_localization_files_to_merge(logger, temp_dir, project_directories)
+            exported_project_files = export_projects(
+                logger, temp_dir, projects, api_key, export_type, timeout)
+            project_directories = unzip_exported_projects(
+                logger, temp_dir, exported_project_files)
+            localization_files_to_merge = get_localization_files_to_merge(
+                logger, temp_dir, project_directories)
 
             merge_localizations(logger, temp_dir, export_type, localization_files_to_merge,
                                 underscorize_localization_keys, kotlin_package)
 
             remove_temp_project_dirs(logger, temp_dir, project_directories)
 
-            copy_files_to_output_directory(logger, clean_output_path_before_export, temp_dir, output_path)
+            copy_files_to_output_directory(
+                logger, clean_output_path_before_export, temp_dir, output_path)
 
             logger.info("Done!")
 
     except Exception as exc:
-        logger.error("Export failed! Don't worry, output path is untouched: " + output_path)
+        logger.error(
+            "Export failed! Don't worry, output path is untouched: " + output_path)
         logger.exception(exc)
         return -2
