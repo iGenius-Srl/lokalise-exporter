@@ -1,14 +1,14 @@
 from setuptools import setup
 
 # https://packaging.python.org/tutorials/distributing-packages
-setup(name='lokalise-exporter',
-      version='0.18',
-      description='Export strings from lokalise.co',
-      long_description='Utility tool to export localization strings from one or multiple lokalise.co projects at '
+setup(name='iGenius-lokalise-exporter',
+      version='0.19',
+      description='Export strings from lokalise.com',
+      long_description='Utility tool to export localization strings from one or multiple lokalise.com projects at '
                        'once for iOS/Android/Frontend/Backend',
-      url='https://github.com/gotev/lokalise-exporter',
-      author='Aleksandar Gotev',
-      author_email='alexgotev@gmail.com',
+      url='https://github.com/iGenius-Srl/lokalise-exporter',
+      author='iGenius',
+      author_email='code@igenius.net',
       license='Apache-2.0',
       # https://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[

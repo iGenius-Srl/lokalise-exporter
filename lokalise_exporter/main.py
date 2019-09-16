@@ -87,7 +87,7 @@ export_types = {
 def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
     logger.info("Exporting project %s", project_id)
 
-    endpoint = "https://lokalise.co/api/project/export"
+    endpoint = "https://lokalise.com/api/project/export"
     post_params = {
         'id': project_id,
         'api_token': api_key,
