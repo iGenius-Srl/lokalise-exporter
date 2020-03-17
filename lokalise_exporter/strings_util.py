@@ -21,8 +21,8 @@ def _unescape_key(s):
     return s.replace('\\\n', '')
 
 
-def _unescape(s):
-    s = s.replace('\\\n', '')
+def _unescape_value(s):
+    s = s.replace('\\\n', '\n')
     return s.replace('\\"', '"').replace(r'\n', '\n').replace(r'\r', '\r')
 
 
@@ -101,7 +101,7 @@ def parse_strings(content="", filename=None):
             end = m.end()
         end = end_
         key = _unescape_key(key)
-        stringset.append({'key': key, 'value': _unescape(value), 'comment': comment})
+        stringset.append({'key': key, 'value': _unescape_value(value), 'comment': comment})
 
     return stringset
 
