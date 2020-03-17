@@ -1,5 +1,5 @@
 # lokalise-exporter [![PyPI version](https://badge.fury.io/py/lokalise-exporter.svg)](https://badge.fury.io/py/lokalise-exporter)
-Utility tool to export localization strings from one or multiple lokalise.co projects at once for iOS/Android/Frontend/Backend
+Utility tool to export localization strings from one or multiple lokalise.com projects at once for iOS/Android/Frontend/Backend
 
 **If you find a bug or you want to extend functionality, nothing is better than a pull request, otherwise open an issue**
 
@@ -16,17 +16,17 @@ Compatible with python 2.7.9+. Python3 is highly recommended.
 If you don't have `pip`, get it [from here](https://pip.pypa.io/en/stable/installing/). If you want a simple one-line-do-it-all install script, if you're on a macOS or linux, just copy and paste this in your command line:
 
 ```shell
-curl -L "https://raw.githubusercontent.com/gotev/lokalise-exporter/master/install-prerequisites.sh" | bash
+curl -L "https://raw.githubusercontent.com/iGenius-Srl/lokalise-exporter/master/install-prerequisites.sh" | bash
 ```
 
 #### Python 3
 ```
-pip3 install lokalise-exporter
+pip3 install igenius-lokalise-exporter
 ```
 
 #### Python 2.7.9+
 ```
-pip install lokalise-exporter
+pip install igenius-lokalise-exporter
 ```
 
 ### macOS users
@@ -36,14 +36,14 @@ pip install lokalise-exporter
 ```
 xcode-select --install
 brew install python3
-pip3 install lokalise-exporter
+pip3 install igenius-lokalise-exporter
 ```
 
 #### Python 2.7.9+
 ```
 xcode-select --install
 brew install python
-pip2 install lokalise-exporter
+pip2 install igenius-lokalise-exporter
 ```
 
 ### Linux users
@@ -53,24 +53,24 @@ To be able to install `lokalise-exporter` successfully, you need the python deve
 **Ubuntu/Debian**
 ```shell
 [sudo] apt-get install python3-dev gcc
-pip3 install lokalise-exporter
+pip3 install igenius-lokalise-exporter
 ```
 **Fedora/CentOS**
 ```shell
 [sudo] yum install python3-devel
-pip3 install lokalise-exporter
+pip3 install igenius-lokalise-exporter
 ```
 
 #### Python 2
 **Ubuntu/Debian**
 ```shell
 [sudo] apt-get install python-dev gcc
-pip install lokalise-exporter
+pip install igenius-lokalise-exporter
 ```
 **Fedora/CentOS**
 ```shell
 [sudo] yum install python-devel
-pip install lokalise-exporter
+pip install igenius-lokalise-exporter
 ```
 
 ## Usage
@@ -78,7 +78,7 @@ pip install lokalise-exporter
 lokalise-exporter "API_KEY" "FORMAT" "PROJECTS_TO_EXPORT" -o "OUTPUT_DIR"
 ```
 where:
-* **API_KEY** is your lokalise.co API key. You can get it from [API Tokens page](https://lokalise.co/account/#apitokens)
+* **API_KEY** is your lokalise.com API key. You can get it from [API Tokens page](https://lokalise.co/account/#apitokens)
 * **FORMAT** is the export format. Supported formats are `json`, `android`, `ios`, `kotlin`. Look [here](#export-formats)
 * **PROJECTS_TO_EXPORT** is a string containing the project IDs to export, separated by a comma. You can get each project's ID from its settings page on lokalise. For each language, you will get a single file containing all the localization strings from all the projects. In case of duplicates, you will see an error message in the console output, but the process would not fail.
 
