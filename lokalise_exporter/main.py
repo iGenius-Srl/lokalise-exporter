@@ -87,24 +87,28 @@ export_types = {
 def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
     logger.info("Exporting project %s", project_id)
 
-    endpoint = "https://lokalise.com/api/project/export"
+    endpoint = f"https://api.lokalise.com/api2/projects/{project_id}/files/download"
     post_params = {
-        'id': project_id,
-        'api_token': api_key,
-        'type': export_types[export_type]['lokalise_type'],
+        'format': export_types[export_type]['lokalise_type'],
         'bundle_structure': '%LANG_ISO%.%FORMAT%',
-        'export_empty': 'skip'
+        'export_empty_as': 'skip',
+        'original_filenames': False
     }
 
     logger.debug("Sending POST %s with data: %s", endpoint, post_params)
 
-    response = post(endpoint, data=post_params, timeout=timeout).json()
+    headers = {
+        'content-type': "application/json",
+        'x-api-token': api_key
+    }
 
-    if response['response']['status'] == 'error':
-        resp = response['response']
-        raise RuntimeError("lokalise error " + str(resp['code']) + ": " + resp['message'])
+    response = post(endpoint, json=post_params, timeout=timeout, headers=headers).json()
 
-    file_to_download = "https://s3-eu-west-1.amazonaws.com/lokalise-assets/" + response['bundle']['file']
+    if 'error' in response:
+        resp = response
+        raise RuntimeError("lokalise error " + str(resp['error']['message']))
+
+    file_to_download = response['bundle_url']
     logger.debug("project %s will be exported from %s", project_id, file_to_download)
 
     downloaded_file = download_file(logger, temp_dir, file_to_download, timeout)
