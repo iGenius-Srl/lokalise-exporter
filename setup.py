@@ -2,7 +2,7 @@ from setuptools import setup
 
 # https://packaging.python.org/tutorials/distributing-packages
 setup(name='iGenius-lokalise-exporter',
-      version='0.21',
+      version='0.22',
       description='Export strings from lokalise.com',
       long_description='Utility tool to export localization strings from one or multiple lokalise.com projects at '
                        'once for iOS/Android/Frontend/Backend',
