@@ -92,7 +92,8 @@ def export_project(logger, temp_dir, api_key, project_id, export_type, timeout):
         'format': export_types[export_type]['lokalise_type'],
         'bundle_structure': '%LANG_ISO%.%FORMAT%',
         'export_empty_as': 'skip',
-        'original_filenames': False
+        'original_filenames': False,
+        'replace_breaks': False,
     }
 
     logger.debug("Sending POST %s with data: %s", endpoint, post_params)
